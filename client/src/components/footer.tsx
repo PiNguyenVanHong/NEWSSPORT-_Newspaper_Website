@@ -1,13 +1,23 @@
+import Logo from "@/assets/logo.png";
+
 import { MoveRight, MoveUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Button } from "./ui/button";
-import { link } from "fs";
+import { Button } from "@/components/ui/button";
+
+const socials = [
+  { id: 1, name: "Facebook", link: "/" },
+  { id: 2, name: "Twitter", link: "/" },
+  { id: 3, name: "Instagram", link: "/" },
+  { id: 4, name: "Pinterest", link: "/" },
+  { id: 5, name: "Linkedin", link: "/" },
+  { id: 6, name: "Youtube", link: "/" },
+];
 
 const Footer = () => {
   return (
     <div className="w-full max-w-7xl mx-auto border border-foreground-gray my-10">
       <div className="flex items-center gap-28 p-10">
-        <h2 className="text-4xl font-medium text-foreground-red uppercase">
+        <h2 className="text-4xl font-extrabold text-foreground-red uppercase">
           Subscribe to our newsletters
         </h2>
         <div className="relative flex-1 z-0 mb-5 group">
@@ -29,21 +39,36 @@ const Footer = () => {
         </div>
       </div>
       <div className="grid grid-cols-3 items-stretch">
-        <div className="border-t border-foreground-gray"></div>
+        <div className="border-t border-foreground-gray flex flex-col items-center justify-center gap-4">
+          <div className="w-52">
+            <img src={Logo} alt="" />
+          </div>
+          <div className="text-foreground-gray uppercase px-24 font-medium text-justify">
+            The leading source for Sport news & Sport event coverage
+          </div>
+        </div>
         <div className="border-l border-t border-foreground-gray py-10 flex flex-col items-center">
           <ul className="flex flex-col gap-2">
             <h5 className="mb-6 uppercase font-medium text-base">News Media</h5>
             <li>
-              <Link to={"/about-us"} className="hover:underline">About Us</Link>
+              <Link to={"/about-us"} className="hover:underline">
+                About Us
+              </Link>
             </li>
             <li>
-              <Link to={"/about-us"} className="hover:underline">Accessibility</Link>
+              <Link to={"/about-us"} className="hover:underline">
+                Accessibility
+              </Link>
             </li>
             <li>
-              <Link to={"/about-us"} className="hover:underline">Advertise</Link>
+              <Link to={"/about-us"} className="hover:underline">
+                Advertise
+              </Link>
             </li>
             <li>
-              <Link to={"/about-us"} className="hover:underline">PMC Fashion & Luxury</Link>
+              <Link to={"/about-us"} className="hover:underline">
+                PMC Fashion & Luxury
+              </Link>
             </li>
           </ul>
         </div>
@@ -51,46 +76,43 @@ const Footer = () => {
           <ul className="flex flex-col gap-2">
             <h5 className="mb-6 uppercase font-medium text-base">Legal</h5>
             <li>
-              <Link to={"/about-us"} className="hover:underline">Terms of Use</Link>
+              <Link to={"/about-us"} className="hover:underline">
+                Terms of Use
+              </Link>
             </li>
             <li>
-              <Link to={"/about-us"} className="hover:underline">Privacy Policy</Link>
+              <Link to={"/about-us"} className="hover:underline">
+                Privacy Policy
+              </Link>
             </li>
             <li>
-              <Link to={"/about-us"} className="hover:underline">AdChoices</Link>
+              <Link to={"/about-us"} className="hover:underline">
+                AdChoices
+              </Link>
             </li>
             <li>
-              <Link to={"/about-us"} className="hover:underline">EU Privacy Preferences</Link>
+              <Link to={"/about-us"} className="hover:underline">
+                EU Privacy Preferences
+              </Link>
             </li>
           </ul>
         </div>
         <div className="border-t border-foreground-gray flex flex-col items-center justify-center">
-            <button className="w-fit text-foreground-red text-2xl font-medium uppercase flex items-center gap-4">
-                <span>send us a tip</span>
-                <MoveUpRight />
-            </button>
+          <button className="w-fit text-foreground-red text-2xl font-medium uppercase flex items-center gap-4">
+            <span>send us a tip</span>
+            <MoveUpRight />
+          </button>
         </div>
         <div className="col-span-2 border-l border-t border-foreground-gray flex items-center justify-center">
-            <ul className="flex items-center gap-6 my-4">
-                <li>
-                    <Button className="font-normal" variant={"link"}>Facebook</Button>
-                </li>
-                <li>
-                    <Button className="font-normal" variant={"link"}>Twitter</Button>
-                </li>
-                <li>
-                    <Button className="font-normal" variant={"link"}>Instagram</Button>
-                </li>
-                <li>
-                    <Button className="font-normal" variant={"link"}>Pinterest</Button>
-                </li>
-                <li>
-                    <Button className="font-normal" variant={"link"}>Likedin</Button>
-                </li>
-                <li>
-                    <Button className="font-normal" variant={"link"}>Youtube</Button>
-                </li>
-            </ul>
+          <ul className="flex items-center gap-6 my-4">
+            {socials.map((item, index) => (
+              <li>
+                <Button className="font-normal" variant={"link"}>
+                  {item.name}
+                </Button>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>

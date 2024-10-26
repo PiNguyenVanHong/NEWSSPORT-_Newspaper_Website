@@ -2,14 +2,15 @@ import { Outlet } from "react-router-dom";
 
 import Footer from "@/components/footer";
 import Header from "@/components/header";
+import TransitionPage from "@/routes/transition-page";
 
 function LayoutPage() {
   return (
-    <div className="flex flex-col items-center justify-center h-full">
+    <TransitionPage>
       <Header />
       <Outlet />
       <Footer />
-    </div>
+    </TransitionPage>
   );
 }
 

@@ -1,8 +1,10 @@
 import Image from "@/assets/news/1.jpg";
 
+import { useEffect } from "react";
 import { ArrowRight, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDatePublish } from "@/lib/format";
+import { animatePageIn } from "@/lib/animations";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -78,7 +80,13 @@ const keywords = [
   },
 ];
 
-function Homepage() {
+interface HomepageProps {}
+
+function Homepage({}: HomepageProps) {
+  useEffect(() => {
+    animatePageIn();
+  }, []);
+
   return (
     <div className="w-full max-w-7xl mx-auto">
       <div className="grid grid-cols-4 gap-8 items-stretch my-6">
