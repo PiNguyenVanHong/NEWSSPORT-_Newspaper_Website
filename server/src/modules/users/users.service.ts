@@ -1,0 +1,109 @@
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import aqp from 'api-query-params';
+
+import { CreateUserDto } from '@/modules/users/dto/create-user.dto';
+import { UpdateUserDto } from '@/modules/users/dto/update-user.dto';
+import { User } from '@/modules/users/entities/user.entity';
+import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
+import { CodeService } from '@/modules/codes/code.service';
+
+@Injectable()
+export class UsersService {
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly codeService: CodeService,
+  ) {}
+
+  async create(createUserDto: CreateUserDto): Promise<Object> {
+    const { email, password, firstName, lastName, avatar } = createUserDto;
+
+    if (await this.isEmailExist(email)) {
+      throw new BadRequestException(`Email already using another account!`);
+    }
+
+    const user = this.userRepository.create({
+      email, password, firstName, lastName, avatar
+    });
+
+    const newUser = await this.userRepository.save(user);
+
+    return { id: newUser.id };
+  }
+
+  async findAll(query: string, current: number, pageSize: number) {
+    const { filter, sort } = aqp(query);
+    if (filter.current) delete filter.current;
+    if (filter.pageSize) delete filter.pageSize;
+
+    if (!current) current = 1;
+    if (!pageSize) pageSize = 10;
+
+    const skip = (current - 1) * pageSize;
+
+    const [users, totalPages] = await this.userRepository.findAndCount({
+      skip: skip,
+      take: pageSize,
+      select: ['id', 'firstName', 'lastName', 'email', 'avatar', 'createdAt'],
+      order: sort,
+    });
+
+    return { results: users, totalPages };
+  }
+
+  async findOne(id: string) {
+    return await this.userRepository.findOneBy({ id });
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    return await this.userRepository.findOneBy({ email });
+  }
+
+  async update(updateUserDto: UpdateUserDto) {
+    if (!(await this.findOne(updateUserDto.id)))
+      throw new BadRequestException(`Email is not exist!`);
+
+    return await this.userRepository.update(updateUserDto.id, {
+      ...updateUserDto,
+    });
+  }
+
+  async remove(id: string) {
+    if (!id) throw new BadRequestException(`Id should not be empty!`);
+    if (!(await this.findOne(id)))
+      throw new BadRequestException(`Email is not exist!`);
+    return await this.userRepository.delete({ id });
+  }
+
+  async isEmailExist(email: string) {
+    const isExist = await this.userRepository.exists({ where: { email } });
+
+    if (isExist) return true;
+    return false;
+  }
+
+  async register(createAuthDto: CreateAuthDto) {
+    const { email, password, confirmPassword, firstName, lastName } = createAuthDto;
+
+    if(password !== confirmPassword) {
+      throw new BadRequestException(`Password/ConfirmPassword not macth!`);
+    }
+
+    if (await this.isEmailExist(email)) {
+      throw new BadRequestException(`Email already using another account!`);
+    }
+
+    const user = this.userRepository.create({
+      email, password, firstName, lastName,
+      isActive: false,
+      isTwoFactorEnabled: true,
+    });
+
+    await this.codeService.generateCodeWithEmail(email);
+
+    const newUser = await this.userRepository.insert(user);
+
+    return newUser.identifiers;
+  }
+}
