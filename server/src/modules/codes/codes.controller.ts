@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { CreateCodeDto } from '@/modules/codes/dto/create-code.dto';
 import { UpdateCodeDto } from '@/modules/codes/dto/update-code.dto';
-import { CodeService } from '@/modules/codes/code.service';
+import { CodesService } from '@/modules/codes/codes.service';
 
 @Controller('codes')
-export class CodeController {
-  constructor(private readonly codesService: CodeService) {}
+export class CodesController {
+  constructor(private readonly codesService: CodesService) {}
 
   @Post()
   create(@Body() createCodeDto: CreateCodeDto) {

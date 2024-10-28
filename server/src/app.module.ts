@@ -3,6 +3,8 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 import { AppService } from '@/app.service';
 import { AppController } from '@/app.controller';
@@ -11,8 +13,9 @@ import { JwtAuthGuard } from '@/auth/passwort/jwt-auth.guard';
 import { UsersModule } from '@/modules/users/users.module';
 import { CategoriesModule } from '@/modules/categories/categories.module';
 import { ArticlesModule } from '@/modules/articles/articles.module';
-import { CodeModule } from './modules/codes/code.module';
-
+import { CodesModule } from '@/modules/codes/codes.module';
+import { RolesModule } from '@/modules/roles/roles.module';
+import { RolesGuard } from '@/modules/roles/guards/roles.guard';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -35,11 +38,39 @@ import { CodeModule } from './modules/codes/code.module';
         return dataSource;
       },
     }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get('MAIL_HOST'),
+          port: configService.get('MAIL_PORT'),
+          secure: true,
+          // ignoreTLS: true,
+          auth: {
+            user: configService.get('MAIL_USER'),
+            pass: configService.get('MAIL_PASSWORD'),
+          },
+        },
+        defaults: {
+          from: '"No Reply" <no-reply@localhost>',
+        },
+        // preview: true,
+        template: {
+          dir: process.cwd() + '/src/mail/templates/',
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
+    }),
     UsersModule,
     CategoriesModule,
     ArticlesModule,
     AuthModule,
-    CodeModule,
+    CodesModule,
+    RolesModule,
   ],
   controllers: [AppController],
   providers: [
@@ -47,6 +78,10 @@ import { CodeModule } from './modules/codes/code.module';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

@@ -7,6 +7,7 @@ import { formatDatePublish } from "@/lib/format";
 import { animatePageIn } from "@/lib/animations";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getTopArticles } from "@/actions/article.api";
 
 const articles = [
   {
@@ -80,6 +81,8 @@ const keywords = [
   },
 ];
 
+const hero1 = getTopArticles();
+
 interface HomepageProps {}
 
 function Homepage({}: HomepageProps) {
@@ -87,30 +90,36 @@ function Homepage({}: HomepageProps) {
     animatePageIn();
   }, []);
 
+  const handleClick = (link: string) => {
+    window.open(link);
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto">
       <div className="grid grid-cols-4 gap-8 items-stretch my-6">
         <div className="col-span-1">
-          {articles.map((item, index) => (
+          {[...hero1].slice(3, 6).map((item, index) => (
             <div
+              key={item.article_id}
               className={cn(
                 "flex flex-col gap-4 py-4",
                 index != 0 && "border-t-2 border-gray-300"
               )}
+              onClick={() => handleClick(item.link)}
             >
               <h2>{item.title}</h2>
               <div className="line-clamp-5 text-foreground-gray font-normal">
                 {item.description}
               </div>
               <div className="flex flex-col gap-0.5 text-foreground-gray font-medium">
-                {item.author.length > 1 ? (
+                {item.creator && item?.creator.length > 1 ? (
                   <div className="flex gap-1.5 items-center">
                     By
-                    {item.author.map((au, index) => {
+                    {item.creator.map((au, index) => {
                       return (
                         <>
                           {index != 0 && <span>and</span>}
-                          <span className="text-foreground-red">{au.name}</span>
+                          <span className="text-foreground-red">{au}</span>
                         </>
                       );
                     })}
@@ -119,12 +128,12 @@ function Homepage({}: HomepageProps) {
                   <div>
                     By{" "}
                     <span className="text-foreground-red">
-                      {item.author[0].name}
+                      {item.creator && item.creator[0]}
                     </span>
                   </div>
                 )}
                 <div className="text-foreground-gray font-medium">
-                  {formatDatePublish(item.publishedAt)}
+                  {formatDatePublish(new Date(item.pubDate))}
                 </div>
               </div>
             </div>
@@ -152,82 +161,69 @@ function Homepage({}: HomepageProps) {
         </div>
         <div className="col-span-2 h-full border-2 border-gray-300 p-4">
           <div className="h-full flex flex-col items-center justify-between">
-            <div className="h-full flex flex-col justify-between">
+            <div className="h-full flex flex-col justify-between gap-2" onClick={() => handleClick(hero1[0].link)}>
               <div className="h-96 relative">
-                <img className="object-cover" src={Image} alt="" />
+                <img
+                  className="object-cover"
+                  src={hero1[0].image_url || Image}
+                  alt=""
+                />
                 <span className="absolute top-5 left-0 uppercase text-white px-4 py-1.5 bg-foreground-red">
                   Main Match
                 </span>
               </div>
               <h2 className="text-3xl font-semibold font-playfair line-clamp-3 leading-8">
-                House Democrats introduce resolution to censure Rep. Gosar over
+                {hero1[0].title}
+                {/* House Democrats introduce resolution to censure Rep. Gosar over
                 animated video that depicted him killing Rep. Ocasio-Cortez
-                dasdasdas sdasdsa asdasd asda ssdasd asd a d asdasd
+                dasdasdas sdasdsa asdasd asda ssdasd asd a d asdasd */}
               </h2>
               <div className="text-foreground-gray font-normal">
-                No matter the eventual outcome, there was little sign that the
+                {hero1[0].description} {hero1[0].source_priority}
+                {/* No matter the eventual outcome, there was little sign that the
                 negotiators would achive the kind of sweeping deal to battle
-                back warming that would satisfy the demands of youth activists.
+                back warming that would satisfy the demands of youth activists. */}
               </div>
               <div className="flex items-center justify-between text-foreground-gray font-medium">
                 <div>
                   By <span className="text-foreground-red">PiKayQi</span> and
                   <span className="text-foreground-red"> Tuan</span>
                 </div>
-                <div>{formatDatePublish(new Date(Date.now() - 30000))}</div>
+                <div>{formatDatePublish(new Date(hero1[0].pubDate))}</div>
               </div>
             </div>
             <div className="flex flex-col gap-6 mt-6">
-              <div className="grid grid-cols-6 gap-4 pt-6 border-t-2 border-gray-300">
-                <div className="col-span-2">
-                  <img className="object-cover" src={Image} alt="" />
-                </div>
-                <div className="col-span-4 flex flex-col gap-2">
-                  <h2>
-                    White House on defensive as Manchin raises concerns about
-                    new spending
-                  </h2>
-                  <div className="line-clamp-2 text-foreground-gray font-normal">
-                    No matter the eventual outcome, there was little sign that
-                    the negotiators would achive the kind of sweeping deal to
-                    battle back warming that would satisfy the demands of youth
-                    activists.
+              {[...hero1].slice(1, 3).map((item) => (
+                <div key={item.article_id} className="grid grid-cols-6 gap-4 pt-6 border-t-2 border-gray-300" onClick={() => handleClick(item.link)}>
+                  <div className="col-span-2">
+                    <img className="object-cover" src={item.image_url || Image} alt="" />
                   </div>
-                  <div className="flex items-center justify-between text-foreground-gray font-medium">
-                    <div>
-                      By <span className="text-foreground-red">PiKayQi</span>{" "}
-                      and
-                      <span className="text-foreground-red"> Tuan</span>
+                  <div className="col-span-4 flex flex-col gap-2">
+                    <h2>
+                      {item.title}
+                      {/* White House on defensive as Manchin raises concerns about
+                      new spending */}
+                    </h2>
+                    <div className="line-clamp-2 text-foreground-gray font-normal">
+                      {item.description}
+                      {/* No matter the eventual outcome, there was little sign that
+                      the negotiators would achive the kind of sweeping deal to
+                      battle back warming that would satisfy the demands of
+                      youth activists. */}
                     </div>
-                    <div>{formatDatePublish(new Date(Date.now() - 30000))}</div>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-6 gap-4 pt-6 border-t-2 border-gray-300">
-                <div className="col-span-2">
-                  <img className="object-cover" src={Image} alt="" />
-                </div>
-                <div className="col-span-4 flex flex-col gap-2">
-                  <h2>
-                    White House on defensive as Manchin raises concerns about
-                    new spending
-                  </h2>
-                  <div className="line-clamp-2 text-foreground-gray font-normal">
-                    No matter the eventual outcome, there was little sign that
-                    the negotiators would achive the kind of sweeping deal to
-                    battle back warming that would satisfy the demands of youth
-                    activists.
-                  </div>
-                  <div className="flex items-center justify-between text-foreground-gray font-medium">
-                    <div>
-                      By <span className="text-foreground-red">PiKayQi</span>{" "}
-                      and
-                      <span className="text-foreground-red"> Tuan</span>
+                    <div className="flex items-center justify-between text-foreground-gray font-medium">
+                      <div>
+                        By <span className="text-foreground-red">PiKayQi</span>{" "}
+                        and
+                        <span className="text-foreground-red"> Tuan</span>
+                      </div>
+                      <div>
+                        {formatDatePublish(new Date(item.pubDate))}
+                      </div>
                     </div>
-                    <div>{formatDatePublish(new Date(Date.now() - 30000))}</div>
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -265,12 +261,13 @@ function Homepage({}: HomepageProps) {
               Change your password here.
             </TabsContent>
           </Tabs>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2" onClick={() => handleClick(hero1[hero1.length - 1].link)}>
             <div>
-              <img src={Image} alt="" />
+              <img src={hero1[hero1.length - 1].image_url|| Image} alt="" />
             </div>
             <h3>
-              Hawley claims American manhood is broken. Where are his solutions?
+              {hero1[hero1.length - 1].title}
+              {/* Hawley claims American manhood is broken. Where are his solutions? */}
             </h3>
             <div className="text-foreground-gray font-medium">
               <span>By</span>
@@ -279,7 +276,7 @@ function Homepage({}: HomepageProps) {
               <span className="text-foreground-red"> Tuan</span>
             </div>
             <div className="text-foreground-gray font-medium">
-              {formatDatePublish(new Date(Date.now() - 50000))}
+              {formatDatePublish(new Date(hero1[hero1.length - 1].pubDate))}
             </div>
           </div>
         </div>

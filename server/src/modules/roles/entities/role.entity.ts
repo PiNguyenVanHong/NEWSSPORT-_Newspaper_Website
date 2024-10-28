@@ -1,16 +1,20 @@
-import { Article } from '@/modules/articles/entities/article.entity';
+import { User } from '@/modules/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: "categories" })
-export class Category {
+@Entity({ name: 'roles' })
+export class Role {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ unique: true })
+  code: string;
 
   @Column()
   name: string;
@@ -18,18 +22,23 @@ export class Category {
   @Column()
   description: string;
 
+  @Column({ unique: true })
+  level: number;
+
   @Column({ default: false })
   isDeleted: boolean;
 
   @Column('datetime', { nullable: true })
   deletedAt: Date;
 
-  @Column()
+  @Column('datetime')
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToMany(() => Article, (article) => article.category, {
-    cascade: true,
-  })
-  articles: Article[];
+  @Column('datetime')
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @OneToMany(() => User, (user) => user.role)
+  users: User[];
 }

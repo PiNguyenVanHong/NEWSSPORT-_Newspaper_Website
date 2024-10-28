@@ -2,13 +2,12 @@ import { JwtService } from '@nestjs/jwt';
 import {
   BadRequestException,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 
 import { UsersService } from '@/modules/users/users.service';
 import { comparePassword } from '@/helpers/util';
-import { User } from '@/modules/users/entities/user.entity';
 import { CreateAuthDto } from './dto/create-auth.dto';
+import { User } from '@/modules/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +18,7 @@ export class AuthService {
     
   }
 
-  async validateUser(email: string, pass: string): Promise<Object> {
+  async validateUser(email: string, pass: string): Promise<User | null> {
     const user = await this.userService.findByEmail(email);
 
     if (!user || !(await comparePassword(pass, user.password))) {
@@ -30,15 +29,17 @@ export class AuthService {
   }
 
   async login(user: any): Promise<Object> {
-    const payload = { sub: user.id };
+    const payload = { sub: user.id, role: user.role.code };
     const age = 60 * 60 * 24;
 
-    return {
-      accessToken: await this.jwtService.signAsync(payload, { expiresIn: age }),
-    };
+    return await this.jwtService.signAsync(payload, { expiresIn: age });
   }
 
   async register(createAuthDto: CreateAuthDto): Promise<Object> {
-    return this.userService.register(createAuthDto);
+    return await this.userService.register(createAuthDto);
+  }
+
+  async getMe(id: string): Promise<Object> {
+    return await this.userService.findMe(id);
   }
 }

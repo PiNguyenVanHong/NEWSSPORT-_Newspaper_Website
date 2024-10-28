@@ -25,6 +25,12 @@ export class Article {
   @Column()
   content: string;
 
+  @Column({ default: false })
+  isDeleted: boolean;
+
+  @Column('datetime', { nullable: true })
+  deletedAt: Date;
+
   @Column('timestamptz')
   @CreateDateColumn()
   createdAt: Date;

@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 import * as crypto from 'crypto';
 
 @Injectable()
-export class CodeService {
+export class CodesService {
   constructor(
     @InjectRepository(Code) private readonly codeRepository: Repository<Code>,
   ) {}

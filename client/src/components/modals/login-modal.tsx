@@ -1,8 +1,9 @@
 import Image from "@/assets/news/1.jpg";
 
 import * as z from "zod";
+import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useModal } from "@/hooks/use-modal-store";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,16 +26,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { login } from "@/actions/auth.api";
+import { AuthContext } from "@/context/auth-context";
 
 const formLoginSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
   termsAccepted: z
     .boolean()
     .refine((val) => val === true, "You must accept the terms and conditions"),
 });
 
 const LoginModal = () => {
+  const { updateToken }: any = useContext(AuthContext);
+
   const { isOpen, onClose, type } = useModal();
   const isModalOpen = isOpen && type === "login-form";
 
@@ -49,9 +54,15 @@ const LoginModal = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formLoginSchema>) => {
-    console.log(values);
-    // Handle form submission
+  const onSubmit = async (values: z.infer<typeof formLoginSchema>) => {
+    const { email, password } = values;
+
+    const { accessToken } = await login(email, password);  
+    
+    updateToken(accessToken);
+    handleClose();
+
+    toast.success("Login Successfully.");
   };
 
   const handleClose = () => {

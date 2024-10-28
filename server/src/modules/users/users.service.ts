@@ -7,24 +7,38 @@ import { CreateUserDto } from '@/modules/users/dto/create-user.dto';
 import { UpdateUserDto } from '@/modules/users/dto/update-user.dto';
 import { User } from '@/modules/users/entities/user.entity';
 import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
-import { CodeService } from '@/modules/codes/code.service';
+import { CodesService } from '@/modules/codes/codes.service';
+import { RolesService } from '@/modules/roles/roles.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-    private readonly codeService: CodeService,
+    private readonly codeService: CodesService,
+    private readonly rolesService: RolesService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<Object> {
-    const { email, password, firstName, lastName, avatar } = createUserDto;
+    const { email, password, roleId, firstName, lastName, avatar } =
+      createUserDto;
 
     if (await this.isEmailExist(email)) {
       throw new BadRequestException(`Email already using another account!`);
     }
 
+    if (!roleId) {
+      throw new BadRequestException('Please choose a role!!!');
+    }
+
+    const role = await this.rolesService.findOne(roleId);
+
     const user = this.userRepository.create({
-      email, password, firstName, lastName, avatar
+      email,
+      password,
+      firstName,
+      lastName,
+      avatar,
+      role,
     });
 
     const newUser = await this.userRepository.save(user);
@@ -45,11 +59,19 @@ export class UsersService {
     const [users, totalPages] = await this.userRepository.findAndCount({
       skip: skip,
       take: pageSize,
-      select: ['id', 'firstName', 'lastName', 'email', 'avatar', 'createdAt'],
+      select: ['id', 'firstName', 'lastName', 'email', 'avatar', 'createdAt', 'role'],
+      relations: ['role'],
       order: sort,
     });
 
     return { results: users, totalPages };
+  }
+
+  async findMe(id: string) {
+    return await this.userRepository.findOne({
+      where: { id },
+      select: ['firstName', 'lastName', 'avatar', 'email'],
+    });
   }
 
   async findOne(id: string) {
@@ -57,7 +79,11 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User> {
-    return await this.userRepository.findOneBy({ email });
+    const user = await this.userRepository.findOne({
+      where: { email },
+      relations: ['role',],
+    });
+    return user;
   }
 
   async update(updateUserDto: UpdateUserDto) {
@@ -84,9 +110,10 @@ export class UsersService {
   }
 
   async register(createAuthDto: CreateAuthDto) {
-    const { email, password, confirmPassword, firstName, lastName } = createAuthDto;
+    const { email, password, confirmPassword, firstName, lastName } =
+      createAuthDto;
 
-    if(password !== confirmPassword) {
+    if (password !== confirmPassword) {
       throw new BadRequestException(`Password/ConfirmPassword not macth!`);
     }
 
@@ -94,15 +121,21 @@ export class UsersService {
       throw new BadRequestException(`Email already using another account!`);
     }
 
+    const role = await this.rolesService.findOneByLevel(2);
+
     const user = this.userRepository.create({
-      email, password, firstName, lastName,
+      email,
+      password,
+      firstName,
+      lastName,
       isActive: false,
       isTwoFactorEnabled: true,
+      role,
     });
+    
+    const newUser = await this.userRepository.insert(user);
 
     await this.codeService.generateCodeWithEmail(email);
-
-    const newUser = await this.userRepository.insert(user);
 
     return newUser.identifiers;
   }

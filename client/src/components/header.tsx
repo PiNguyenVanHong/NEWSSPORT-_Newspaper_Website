@@ -1,9 +1,14 @@
 import { useTranslation } from "react-i18next";
-import { Search, Slash } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { ChevronDown, Search, Slash, UserRound } from "lucide-react";
+import { useContext, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useModal } from "@/hooks/use-modal-store";
+import { AuthContext } from "@/context/auth-context";
+
 import TransitionLink from "@/components/tranisition-link";
+import { Button } from "./ui/button";
+import { AuthMeType, getMe } from "@/actions/auth.api";
 
 const menu = [
   { id: 1, label: "events", link: "/events" },
@@ -24,10 +29,26 @@ const navbars = [
 ];
 
 const Header = () => {
-  const { t, i18n } = useTranslation(['header']);
+  const { userId, token }: any = useContext(AuthContext);
+  const { t, i18n } = useTranslation(["header"]);
   const location = useLocation();
-
   const { onOpen } = useModal();
+
+  const [currentUser, setCurrentUser] = useState<AuthMeType | null>(null);
+
+  useEffect(() => {
+    if (!token) {
+      setCurrentUser(null);
+      return;
+    }
+
+    const getUser = async () => {
+      const userInfo = await getMe(token);
+      setCurrentUser(userInfo);
+    };
+
+    getUser();
+  }, [token]);
 
   const switchLanguage = (lng: "en" | "vi") => {
     i18n.changeLanguage(lng);
@@ -35,15 +56,19 @@ const Header = () => {
 
   const handleLogin = () => {
     onOpen("login-form");
-  }
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto my-4">
       <div className="flex items-center justify-between text-foreground-gray uppercase font-medium text-sm">
         <div className="flex items-center gap-4">
           {menu.map((item) => (
-            <TransitionLink key={item.id} href={item.link} label={item.label} className="hover:opacity-80">
-            </TransitionLink>
+            <TransitionLink
+              key={item.id}
+              href={item.link}
+              label={item.label}
+              className="hover:opacity-80"
+            ></TransitionLink>
           ))}
         </div>
         <div className="flex items-center gap-2">
@@ -59,7 +84,7 @@ const Header = () => {
           <button onClick={() => switchLanguage("en")}>EN</button>
         </div>
         <div className="w-full flex items-center justify-between">
-          <div className="flex items-center gap-2 min-w-52">
+          <div className="max-w-80 flex items-center gap-2 min-w-52">
             <Search size={18} />
             <input
               type="text"
@@ -69,21 +94,52 @@ const Header = () => {
               required
             />
           </div>
-          <div className="text-5xl text-center uppercase font-semibold font-second cursor-pointer">
-          <TransitionLink href="/" label="News Sport+" />
+          <div className="flex-1 text-5xl text-center uppercase font-semibold font-second cursor-pointer">
+            <TransitionLink href="/" label="News Sport+" />
           </div>
-          <div className="flex items-center gap-4">
-            <button className="uppercase font-semibold p-2" onClick={handleLogin}>login</button>
-            <button className="py-2 px-6 bg-foreground text-white uppercase">
-              subscribe and get 50% off
-            </button>
+          <div className="max-w-80 flex items-center gap-4">
+            {currentUser ? (
+              <>
+                <button className="py-2 px-6 bg-foreground text-white uppercase">
+                  subscribe for more
+                </button>
+                <Button className="gap-2" variant={"outline"}>
+                  <UserRound />
+                  <span>{currentUser.firstName}</span>
+                  <ChevronDown />
+                </Button>
+              </>
+            ) : (
+              <>
+                <button
+                  className="uppercase font-semibold p-2"
+                  onClick={handleLogin}
+                >
+                  login
+                </button>
+                <button className="py-2 px-6 bg-foreground text-white uppercase">
+                  subscribe and get 50% off
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
       <ul className="flex items-center justify-between border-b-2 border-gray-300 py-6">
         {navbars.map((item, index) => (
-          <li key={item.id} className={cn("px-6 uppercase font-semibold", index != 0 && "border-l-2 border-gray-300", location.pathname === t(`header-bottom.${item.label}.link`) && "text-foreground-red")}>
-            <TransitionLink href={t(`header-bottom.${item.label}.link`)} label={t(`header-bottom.${item.label}.label`)} />
+          <li
+            key={item.id}
+            className={cn(
+              "px-6 uppercase font-semibold",
+              index != 0 && "border-l-2 border-gray-300",
+              location.pathname === t(`header-bottom.${item.label}.link`) &&
+                "text-foreground-red"
+            )}
+          >
+            <TransitionLink
+              href={t(`header-bottom.${item.label}.link`)}
+              label={t(`header-bottom.${item.label}.label`)}
+            />
           </li>
         ))}
       </ul>

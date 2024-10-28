@@ -6,10 +6,15 @@ import "@/lib/i18n.ts";
 
 import App from "@/App.tsx";
 import { ModalProvider } from "@/providers/modal-provider.tsx";
+import { AuthContextProvider } from "./context/auth-context";
+import { Toaster } from "@/components/ui/sonner";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ModalProvider />
-    <App />
+    <AuthContextProvider >
+      <Toaster />
+      <ModalProvider />
+      <App />
+    </AuthContextProvider>
   </StrictMode>
 );

@@ -1,4 +1,5 @@
 import { hashPassword } from '@/helpers/util';
+import { Role } from '@/modules/roles/entities/role.entity';
 import { Exclude } from 'class-transformer';
 import {
   Entity,
@@ -7,6 +8,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BeforeInsert,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity({ name: 'users' })
@@ -46,6 +48,15 @@ export class User {
   @Column('datetime')
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ default: false })
+  isDeleted: boolean;
+
+  @Column('datetime', { nullable: true })
+  deletedAt: Date;
+
+  @ManyToOne(() => Role, (role) => role.users)
+  role: Role;
 
   @BeforeInsert()
   public async hashPassword() {
