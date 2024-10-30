@@ -1,0 +1,49 @@
+.alice-carousel {
+    height: 100%;
+}
+
+.alice-carousel>div:not(.alice-carousel__prev-btn, .alice-carousel__next-btn) {
+    height: 100%;
+}
+
+.alice-carousel .alice-carousel__wrapper {
+    height: 100%;
+}
+
+.alice-carousel img {
+    height: 98vh;
+    filter: brightness(.85)
+}
+
+.alice-carousel .alice-carousel__dots {
+    width: 100%;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.alice-carousel__dots-item:not(.__custom) {
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background-color: rgba(0, 0, 0, .6);
+}
+
+.alice-carousel__dots-item:not(.__custom):not(:last-child) {
+    margin-right: 0;
+}
+
+.alice-carousel__dots-item:not(.__custom):hover, .alice-carousel__dots-item:not(.__custom).__active {
+    /* background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%); */
+    background: linear-gradient(to left, #12c2e9, #c471ed, #f64f59);
+}
+
+.alice-carousel__play-btn {
+    display: none;
+    visibility: hidden;
+}

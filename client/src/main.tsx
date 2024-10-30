@@ -12,7 +12,7 @@ import { Toaster } from "@/components/ui/sonner";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AuthContextProvider >
-      <Toaster />
+      <Toaster richColors theme="light" />
       <ModalProvider />
       <App />
     </AuthContextProvider>

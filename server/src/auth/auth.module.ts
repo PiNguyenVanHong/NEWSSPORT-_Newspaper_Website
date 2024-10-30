@@ -8,10 +8,12 @@ import { AuthController } from '@/auth/auth.controller';
 import { LocalStrategy } from '@/auth/passwort/local.strategy';
 import { UsersModule } from '@/modules/users/users.module';
 import { JwtStrategy } from '@/auth/passwort/jwt.strategy';
+import { CodesModule } from '@/modules/codes/codes.module';
 
 @Module({
   imports: [
     UsersModule,
+    CodesModule,
     PassportModule,
     ConfigModule,
     JwtModule.registerAsync({

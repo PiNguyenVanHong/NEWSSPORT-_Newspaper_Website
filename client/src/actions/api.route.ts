@@ -6,6 +6,8 @@ const AUTH_ROUTES = `${HOST}/api/auth`;
 const USER_ROUTES = `${HOST}/api/users`;
 
 export const LOGIN_ROUTE = `${AUTH_ROUTES}/login`;
+export const REGISTER_ROUTE = `${AUTH_ROUTES}/register`;
+export const VERIFY_REGISTER_ROUTE = `${AUTH_ROUTES}/verify`;
 export const GET_ME_ROUTE = `${AUTH_ROUTES}/me`;
 
 

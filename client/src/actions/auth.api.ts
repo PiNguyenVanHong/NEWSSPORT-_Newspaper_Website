@@ -1,5 +1,6 @@
-import { GET_ME_ROUTE, LOGIN_ROUTE, requestClient } from "@/actions/api.route";
+import { GET_ME_ROUTE, LOGIN_ROUTE, REGISTER_ROUTE, requestClient, VERIFY_REGISTER_ROUTE } from "@/actions/api.route";
 import { getToken } from "@/lib/utils";
+import { AuthRegister } from "@/types/auth.type";
 
 export type AuthMeType = {
   email: string;
@@ -17,10 +18,25 @@ const HeaderConfig = (token: string) => {
   };
 };
 
-export async function login(email: string, password: string) {
+export const login = async (email: string, password: string) => {
   const { data } = await requestClient.post(LOGIN_ROUTE, {
     email,
     password,
+  });
+
+  return data;
+}
+
+export const register = async (body: AuthRegister) => {
+  const { data } = await requestClient.post(REGISTER_ROUTE, body);
+
+  return data;
+}
+
+export const verifyRegister = async (email: string, code: string) => {
+  const { data } = await requestClient.post(VERIFY_REGISTER_ROUTE, {
+    email,
+    code
   });
 
   return data;

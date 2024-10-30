@@ -29,6 +29,6 @@ export class CodesController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.codesService.remove(+id);
+    return this.codesService.remove(id);
   }
 }

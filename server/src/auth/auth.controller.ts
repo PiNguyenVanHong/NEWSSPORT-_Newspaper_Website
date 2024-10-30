@@ -7,7 +7,6 @@ import {
   Body,
   Response,
 } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { Request as ReqExpress, Response as ResExpress } from 'express';
 
@@ -15,13 +14,13 @@ import { Public } from '@/decorator/auth.decorator';
 import { AuthService } from '@/auth/auth.service';
 import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { LocalAuthGuard } from '@/auth/passwort/local-auth.guard';
+import { VerifyAuthDto } from './dto/verify-auth.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
-    private readonly mailerService: MailerService,
   ) {}
 
   @Public()
@@ -43,6 +42,12 @@ export class AuthController {
     return this.authService.register(body);
   }
 
+  @Public()
+  @Post('verify')
+  handleVerify(@Body() body: VerifyAuthDto) {
+    return this.authService.verify(body);
+  }
+
   @Get('me')
   getMe(@Request() req) {
     const userId = req.user.userId;
@@ -51,20 +56,7 @@ export class AuthController {
 
   @Get('mail')
   @Public()
-  testMail() {
-    this.mailerService
-      .sendMail({
-        to: 'pi.nguyenvanhong@gmail.com', 
-        subject: 'Testing Nest MailerModule ✔', 
-        text: 'welcome', 
-        template: "register",
-        context: {
-          name: "PiKayQi",
-          id: 123456,
-        }
-      })
-      .then(() => {})
-      .catch(() => {});
-    return 'sent successfull';
+  testMail(@Body() body: VerifyAuthDto) {
+    return this.authService.sendMail(body);
   }
 }

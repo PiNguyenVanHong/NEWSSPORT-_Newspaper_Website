@@ -1,10 +1,11 @@
+import * as crypto from 'crypto';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
+
 import { CreateCodeDto } from './dto/create-code.dto';
 import { UpdateCodeDto } from './dto/update-code.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Code } from './entities/code.entity';
-import { Repository } from 'typeorm';
-import * as crypto from 'crypto';
 
 @Injectable()
 export class CodesService {
@@ -14,9 +15,9 @@ export class CodesService {
 
   async generateCodeWithEmail(email: string) {
     const code = crypto.randomInt(100_000, 1_000_000).toString();
-    const expires = new Date(Date.now() + 60 * 5);
-
-    return this.create({ email, code, expires });
+    const expires = new Date(Date.now() + 1000 * 60 * 5);
+    await this.create({ email, code, expires });
+    return { code };
   }
 
   async create(createCodeDto: CreateCodeDto) {
@@ -28,11 +29,9 @@ export class CodesService {
       } else {
         throw new BadRequestException("Your code just sent, please check your email!!!");
       }
-
     }
 
     const code = this.codeRepository.create(createCodeDto);
-
     return await this.codeRepository.save(code);
   }
 
@@ -41,6 +40,10 @@ export class CodesService {
 
     return isExist;
   };
+
+  async findOneByEmail(email: string) {
+    return await this.codeRepository.findOneBy({ email });
+  }
 
   findAll() {
     return `This action returns all codes`;
@@ -54,7 +57,8 @@ export class CodesService {
     return `This action updates a #${id} code`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} code`;
+  async remove(id: string) {
+    await this.codeRepository.delete(id);
+    return `Delete code successfully`;
   }
 }

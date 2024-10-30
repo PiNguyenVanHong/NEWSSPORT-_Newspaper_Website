@@ -95,6 +95,12 @@ export class UsersService {
     });
   }
 
+  async updateIsActiveByEmail(email: string, isActive: boolean) {
+    await this.userRepository.update({ email }, {
+      isActive
+    })
+  }
+
   async remove(id: string) {
     if (!id) throw new BadRequestException(`Id should not be empty!`);
     if (!(await this.findOne(id)))
@@ -135,8 +141,7 @@ export class UsersService {
     
     const newUser = await this.userRepository.insert(user);
 
-    await this.codeService.generateCodeWithEmail(email);
-
-    return newUser.identifiers;
+    const { code } = await this.codeService.generateCodeWithEmail(email);
+    return { email: user.email, code };
   }
 }
