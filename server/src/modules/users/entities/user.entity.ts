@@ -1,5 +1,7 @@
 import { hashPassword } from '@/helpers/util';
+import { Article } from '@/modules/articles/entities/article.entity';
 import { Role } from '@/modules/roles/entities/role.entity';
+import { SocialLink } from '@/modules/social-links/entities/social-link.entity';
 import { Exclude } from 'class-transformer';
 import {
   Entity,
@@ -9,6 +11,7 @@ import {
   UpdateDateColumn,
   BeforeInsert,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 
 @Entity({ name: 'users' })
@@ -57,6 +60,14 @@ export class User {
 
   @ManyToOne(() => Role, (role) => role.users)
   role: Role;
+
+  @OneToMany(() => Article, (article) => article.user)
+  articles: Article[];
+
+  @OneToMany(() => SocialLink, (socialLink) => socialLink.user, {
+    cascade: true,
+  })
+  socialLinks: SocialLink[];
 
   @BeforeInsert()
   public async hashPassword() {

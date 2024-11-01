@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   Query,
+  UseInterceptors,
+  Inject,
 } from '@nestjs/common';
 
 import { UsersService } from '@/modules/users/users.service';
@@ -14,10 +16,13 @@ import { CreateUserDto } from '@/modules/users/dto/create-user.dto';
 import { UpdateUserDto } from '@/modules/users/dto/update-user.dto';
 import { Role } from '@/modules/roles/role.enum';
 import { Roles } from '@/decorator/roles.decorator';
+import { CacheKey, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService
+  ) {}
 
   @Post()
   @Roles(Role.ADMIN)
@@ -26,6 +31,8 @@ export class UsersController {
   }
 
   @Get()
+  @CacheKey("all_users")
+  @CacheTTL(1)
   findAll(
     @Query() query: string,
     @Query("current") current: string,

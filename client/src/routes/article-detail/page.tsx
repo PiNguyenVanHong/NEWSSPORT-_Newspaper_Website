@@ -5,6 +5,7 @@ import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { animatePageIn } from "@/lib/animations";
 import { formatDatePublish, formatDateBasis } from "@/lib/format";
+import BreadcrumbCustom from "@/components/breadcumb-custom";
 
 const socials = [
   { id: 1, name: "Facebook", link: "/" },
@@ -22,6 +23,14 @@ const topics = [
   { label: "Pre-raphaelites", link: "/" },
 ];
 
+const breadcrumbs = [
+  { label: "Homepage", link: "/" },
+  { label: "dadsa", link: "/" },
+  { label: "24234", link: "/" },
+  { label: "Sports", link: "/" },
+  { label: "abc xyz tsz" },
+];
+
 const FORMAT_DATE = "MMM dd, yyyy hh:mm aaa";
 
 function ArticleDetailPage() {
@@ -35,7 +44,15 @@ function ArticleDetailPage() {
 
   return (
     <div className="w-full max-w-7xl mx-auto">
-      <div className="grid grid-cols-3 border border-foreground-gray my-10">
+      <div className="mb-10 mt-6">
+        <BreadcrumbCustom data={breadcrumbs} />
+      </div>
+      <div className="grid grid-cols-3 border border-foreground-gray">
+        <div className="col-span-3">
+          <div className="w-full h-[450px]">
+            <img src={Image} alt="" />
+          </div>
+        </div>
         <div className="col-span-2 flex flex-col justify-between">
           <div className="flex flex-col items-start gap-8 p-10 border border-foreground-gray flex-1">
             <div className="flex items-center gap-4">
@@ -50,7 +67,7 @@ function ArticleDetailPage() {
               On the 'Noble Failure' of the Pre-Raphaelites, a Group Long Held
               in 'Generally Low Repute,' in 1964
             </h2>
-            <div className="h-96">
+            <div className="w-full h-96">
               <img src={Image} alt="" />
             </div>
             <div>

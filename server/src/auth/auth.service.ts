@@ -8,6 +8,7 @@ import { User } from '@/modules/users/entities/user.entity';
 import { VerifyAuthDto } from './dto/verify-auth.dto';
 import { CodesService } from '@/modules/codes/codes.service';
 import { MailerService } from '@nestjs-modules/mailer';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -21,8 +22,12 @@ export class AuthService {
   async validateUser(email: string, pass: string): Promise<User | null> {
     const user = await this.userService.findByEmail(email);
 
-    if (!user || !(await comparePassword(pass, user.password))) {
-      return null;
+    if(!user) {
+      throw new BadRequestException("Your email is not exist!!!");
+    }
+
+    if (!(await comparePassword(pass, user.password))) {
+      throw new BadRequestException("Password is not match!!!");
     }
 
     return user;
@@ -38,6 +43,10 @@ export class AuthService {
   async register(createAuthDto: CreateAuthDto): Promise<Object> {
     const { email, code } = await this.userService.register(createAuthDto);
     return await this.sendMail({ email, code });
+  }
+
+  async logout(data: any) {
+    console.log(data.userId);
   }
 
   async verify(verifyAuthDto: VerifyAuthDto): Promise<Object> {

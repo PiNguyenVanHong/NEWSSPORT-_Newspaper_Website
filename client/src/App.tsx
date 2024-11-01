@@ -9,8 +9,14 @@ import NotFoundPage from "@/routes/not-found/page";
 import SignInPage from "@/routes/sign-in/page";
 import SignUpPage from "@/routes/sign-up/page";
 import VerifyPage from "@/routes/verify/page";
+import DashboardPage from "@/routes/dashboard/page";
+import DashboardCategoryPage from "@/routes/dashboard/category/page";
+import DashboardArticlePage from "@/routes/dashboard/article/page";
+import DashboardCreateArticlePage from "@/routes/dashboard/article/create/page";
+
 import LayoutPage from "@/components/layout/layout";
 import AuthLayoutPage from "@/components/layout/auth-layout";
+import DashboardLayoutPage from "@/components/layout/dashboard-layout";
 
 function App() {
   const router = createBrowserRouter([
@@ -44,6 +50,28 @@ function App() {
           element: <NotFoundPage />,
         },
       ],
+    },
+    {
+      path: "/dashboard",
+      element: <DashboardLayoutPage />,
+      children: [
+        {
+          path: "/dashboard",
+          element: <DashboardPage />,
+        },
+        {
+          path: "/dashboard/categories",
+          element: <DashboardCategoryPage />
+        },
+        {
+          path: "/dashboard/articles",
+          element: <DashboardArticlePage  />
+        },
+        {
+          path: "/dashboard/articles/create",
+          element: <DashboardCreateArticlePage  />
+        },
+      ]
     },
     {
       path: "/",

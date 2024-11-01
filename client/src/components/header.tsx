@@ -1,14 +1,22 @@
+import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, Search, Slash, UserRound } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useModal } from "@/hooks/use-modal-store";
 import { AuthContext } from "@/context/auth-context";
+import { AuthMeType, getMe, logout } from "@/actions/auth.api";
 
 import TransitionLink from "@/components/tranisition-link";
-import { Button } from "./ui/button";
-import { AuthMeType, getMe } from "@/actions/auth.api";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const menu = [
   { id: 1, label: "events", link: "/events" },
@@ -29,9 +37,10 @@ const navbars = [
 ];
 
 const Header = () => {
-  const { userId, token }: any = useContext(AuthContext);
+  const { userId, token, logout }: any = useContext(AuthContext);
   const { t, i18n } = useTranslation(["header"]);
   const location = useLocation();
+  const navigate = useNavigate();
   const { onOpen } = useModal();
 
   const [currentUser, setCurrentUser] = useState<AuthMeType | null>(null);
@@ -56,6 +65,20 @@ const Header = () => {
 
   const handleLogin = () => {
     onOpen("login-form");
+  };
+
+  const handleLogout = async () => {
+    try {
+      const { message } = await logout(userId, token);
+
+      logout();
+      toast.success(message);
+
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      toast.error("Something wen wrong!!!");
+    }
   };
 
   return (
@@ -103,11 +126,22 @@ const Header = () => {
                 <button className="py-2 px-6 bg-foreground text-white uppercase">
                   subscribe for more
                 </button>
-                <Button className="gap-2" variant={"outline"}>
-                  <UserRound />
-                  <span>{currentUser.firstName}</span>
-                  <ChevronDown />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <div className="gap-2 flex items-center p-2">
+                      <UserRound size={18} />
+                      <span>{currentUser.firstName}</span>
+                      <ChevronDown />
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Profile</DropdownMenuItem>
+                    <DropdownMenuItem>Billing</DropdownMenuItem>
+                    <DropdownMenuItem>Team</DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
               <>

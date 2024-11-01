@@ -16,6 +16,8 @@ import { ArticlesModule } from '@/modules/articles/articles.module';
 import { CodesModule } from '@/modules/codes/codes.module';
 import { RolesModule } from '@/modules/roles/roles.module';
 import { RolesGuard } from '@/modules/roles/guards/roles.guard';
+import { SocialLinksModule } from '@/modules/social-links/social-links.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -71,6 +73,7 @@ import { RolesGuard } from '@/modules/roles/guards/roles.guard';
     AuthModule,
     CodesModule,
     RolesModule,
+    SocialLinksModule,
   ],
   controllers: [AppController],
   providers: [

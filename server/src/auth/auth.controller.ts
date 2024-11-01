@@ -42,6 +42,19 @@ export class AuthController {
     return this.authService.register(body);
   }
 
+  @Post('logout')
+  async handelLogout(
+    @Body() body: any,
+    @Response() res: ResExpress
+  ) {
+    await this.authService.logout(body);
+
+    const frontendDomain = this.configService.get<string>('FRONTEND_DOMAIN');
+    res.cookie('accessToken', null, { httpOnly: true, domain: frontendDomain})
+
+    return res.send({ message: "Logout Successfully!!!" })
+  }
+
   @Public()
   @Post('verify')
   handleVerify(@Body() body: VerifyAuthDto) {
