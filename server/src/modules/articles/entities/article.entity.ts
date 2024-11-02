@@ -23,10 +23,10 @@ export class Article {
   @Column()
   link: string;
 
-  @Column()
+  @Column({ type: "mediumtext", nullable: true })
   content: string;
 
-  @Column()
+  @Column({ nullable: true })
   thumbnail: string;
   
   @Column('datetime', { nullable: true })

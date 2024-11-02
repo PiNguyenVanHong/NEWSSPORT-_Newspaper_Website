@@ -9,12 +9,14 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request as ReqExpress, Response as ResExpress } from 'express';
-
 import { Public } from '@/decorator/auth.decorator';
+import { Roles } from '@/decorator/roles.decorator';
+import { Role } from '@/modules/roles/role.enum';
+
 import { AuthService } from '@/auth/auth.service';
 import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { LocalAuthGuard } from '@/auth/passwort/local-auth.guard';
-import { VerifyAuthDto } from './dto/verify-auth.dto';
+import { VerifyAuthDto } from '@/auth/dto/verify-auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -48,7 +50,6 @@ export class AuthController {
     @Response() res: ResExpress
   ) {
     await this.authService.logout(body);
-
     const frontendDomain = this.configService.get<string>('FRONTEND_DOMAIN');
     res.cookie('accessToken', null, { httpOnly: true, domain: frontendDomain})
 
@@ -62,7 +63,8 @@ export class AuthController {
   }
 
   @Get('me')
-  getMe(@Request() req) {
+  @Roles(Role.USER, Role.ADMIN)
+  getMe(@Request() req: any) {
     const userId = req.user.userId;
     return this.authService.getMe(userId); 
   }

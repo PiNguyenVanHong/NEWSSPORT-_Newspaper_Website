@@ -7,8 +7,9 @@ interface AuthProviderProps {
 
 export interface AuthContextProps {
   userId: string | undefined;
+  role: string | undefined;
   token: string | undefined;
-  updateToken: (tokenData: string) => void | undefined;
+  updateToken: (tokenData: string) => Promise<void> | undefined;
   logout: () => void | undefined;
 }
 
@@ -18,21 +19,32 @@ export const AuthContext = createContext<AuthContextProps | undefined>(
 
 export const AuthContextProvider = ({ children }: AuthProviderProps) => {
   const [userId, setUserId] = useState<string | undefined>(undefined);
+  const [role, setRole] = useState<string | undefined>(undefined);
 
   const [token, setToken] = useState<string | undefined>(
     JSON.parse(localStorage.getItem("token")!) || undefined
   );
 
-  const updateToken = (tokenData: string) => {
+  const updateToken = async (tokenData: string) => {
     setToken(tokenData);
-    setUserId(jwtDecode(tokenData).sub);
+    const { sub, role }: any = await jwtDecode(tokenData);
+    setUserId(sub);
+    setRole(role);
   };
 
   const logout = () => {
     setToken(undefined);
+    setRole(undefined);
     setUserId(undefined);
     localStorage.setItem("token", JSON.stringify(null));
   };
+
+  useEffect(() => {
+    if(!token) return;
+      const { sub, role }: any = jwtDecode(token);
+      setUserId(sub);
+      setRole(role);
+  }, []);
 
   useEffect(() => {
     if (token !== undefined)
@@ -40,7 +52,7 @@ export const AuthContextProvider = ({ children }: AuthProviderProps) => {
   }, [userId]);
 
   return (
-    <AuthContext.Provider value={{ userId, token, updateToken, logout }}>
+    <AuthContext.Provider value={{ userId, role, token, updateToken, logout }}>
       {children}
     </AuthContext.Provider>
   );

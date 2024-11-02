@@ -2,7 +2,6 @@ import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { UnauthorizedException } from '@nestjs/common';
 import { IS_ROLE_KEY } from '@/decorator/roles.decorator';
-import { User } from '@/modules/users/entities/user.entity';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -17,7 +16,7 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    if (!user || !roles.includes(user.role.code)) {
+    if (!user || !roles.includes(user.role)) {
       throw new UnauthorizedException('Access Denied: Insufficient permissions');
     }
 

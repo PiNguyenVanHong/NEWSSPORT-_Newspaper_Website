@@ -16,7 +16,8 @@
         "./src/*"
       ],
     },
-    "incremental": true,
+    "noEmit": false,
+    "incremental": false,
     "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
@@ -24,5 +25,4 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
   },
-  "include": ["src/**/*.ts"],
 }

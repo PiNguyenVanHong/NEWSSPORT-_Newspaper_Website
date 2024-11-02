@@ -14,8 +14,8 @@ export class CreateArticleDto {
     content: string;
 
     @IsNotEmpty()
-    thumbnail: File;
+    categoryId: string;
 
-    @IsNotEmpty()
-    category: string;
+    @IsOptional()
+    userId: string;
 }

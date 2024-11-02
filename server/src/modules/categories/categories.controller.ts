@@ -1,25 +1,32 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { CategoriesService } from './categories.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+
+import { Public } from '@/decorator/auth.decorator';
+import { Roles } from '@/decorator/roles.decorator';
+import { Role } from '@/modules/roles/role.enum';
+import { CategoriesService } from '@/modules/categories/categories.service';
+import { CreateCategoryDto } from '@/modules/categories/dto/create-category.dto';
+import { UpdateCategoryDto } from '@/modules/categories/dto/update-category.dto';
 
 @Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
+  @Roles(Role.ADMIN)
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoriesService.create(createCategoryDto);
   }
 
   @Get()
+  @Public()
   findAll() {
     return this.categoriesService.findAll();
   }
 
   @Get(':id')
+  @Roles(Role.ADMIN)
   findOne(@Param('id') id: string) {
-    return this.categoriesService.findOne(+id);
+    return this.categoriesService.findOne(id);
   }
 
   @Patch(':id')

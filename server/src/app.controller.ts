@@ -8,7 +8,6 @@ import {
 import { AppService } from './app.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from './helpers/storage.config';
-import { Public } from './decorator/auth.decorator';
 
 @Controller()
 export class AppController {
@@ -19,10 +18,11 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Post('upload')
-  @Public()
-  @UseInterceptors(FileInterceptor('file', multerOptions))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
+  @Post('uploads')
+  @UseInterceptors(FileInterceptor('thumbnail', multerOptions))
+  uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     return {
       file
     }

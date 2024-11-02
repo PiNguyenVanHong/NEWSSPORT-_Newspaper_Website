@@ -1,15 +1,42 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ArticlesService } from './articles.service';
-import { CreateArticleDto } from './dto/create-article.dto';
-import { UpdateArticleDto } from './dto/update-article.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+  Req,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+
+import { Roles } from '@/decorator/roles.decorator';
+import { Role } from '@/modules/roles/role.enum';
+import { multerOptions } from '@/helpers/storage.config';
+import { ArticlesService } from '@/modules/articles/articles.service';
+import { CreateArticleDto } from '@/modules/articles/dto/create-article.dto';
+import { UpdateArticleDto } from '@/modules/articles/dto/update-article.dto';
 
 @Controller('articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
   @Post()
-  create(@Body() createArticleDto: CreateArticleDto) {
-    return this.articlesService.create(createArticleDto);
+  @Roles(Role.ADMIN)
+  create(@Body() createArticleDto: CreateArticleDto, @Req() req) {
+    return this.articlesService.create({...createArticleDto, userId: req.user.userId});
+  }
+
+  @Post('uploads/:id')
+  @Roles(Role.ADMIN)
+  @UseInterceptors(FileInterceptor('thumbnail', multerOptions))
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id') id: string,
+  ) {
+    return this.articlesService.updateArticleThumbnail({ articleId: id, path: file.path });
   }
 
   @Get()
@@ -19,7 +46,7 @@ export class ArticlesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.articlesService.findOne(+id);
+    return this.articlesService.findOne(id);
   }
 
   @Patch(':id')

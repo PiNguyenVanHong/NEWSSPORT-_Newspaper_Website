@@ -7,8 +7,6 @@ import {
   Param,
   Delete,
   Query,
-  UseInterceptors,
-  Inject,
 } from '@nestjs/common';
 
 import { UsersService } from '@/modules/users/users.service';

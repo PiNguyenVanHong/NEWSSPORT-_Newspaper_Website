@@ -2,7 +2,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, Search, Slash, UserRound } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useModal } from "@/hooks/use-modal-store";
 import { AuthContext } from "@/context/auth-context";
@@ -37,7 +37,7 @@ const navbars = [
 ];
 
 const Header = () => {
-  const { userId, token, logout }: any = useContext(AuthContext);
+  const { userId, role, token, logout: logoutClient }: any = useContext(AuthContext);
   const { t, i18n } = useTranslation(["header"]);
   const location = useLocation();
   const navigate = useNavigate();
@@ -71,7 +71,7 @@ const Header = () => {
     try {
       const { message } = await logout(userId, token);
 
-      logout();
+      logoutClient();
       toast.success(message);
 
       navigate("/");
@@ -136,6 +136,11 @@ const Header = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuSeparator />
+                    {role === "ADMIN" && (
+                      <DropdownMenuItem>
+                        <Link to={"/dashboard"}>Dashboard</Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem>Profile</DropdownMenuItem>
                     <DropdownMenuItem>Billing</DropdownMenuItem>
                     <DropdownMenuItem>Team</DropdownMenuItem>
