@@ -230,7 +230,7 @@ function DashboardCreateArticlePage() {
                         <FormField
                           control={form.control}
                           name="thumbnail"
-                          render={({ field }) => (
+                          render={() => (
                             <FormItem>
                               <FormControl>
                                 <Input

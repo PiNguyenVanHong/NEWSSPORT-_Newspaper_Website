@@ -9,44 +9,44 @@ import { animatePageIn } from "@/lib/animations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getTopArticles } from "@/actions/article.api";
 
-const articles = [
-  {
-    id: 1,
-    title:
-      "White House on defensive as Manchin raises concerns about new spending",
-    description:
-      "No matter the eventual outcome, there was little sign that the negotiators would achive the kind of sweeping deal to battle back warming that would satisfy the demands of youth activists.",
-    thumbnail: Image,
-    author: [
-      { id: "author-01", name: "PiKayQi" },
-      { id: "author-02", name: "Tuan" },
-    ],
-    publishedAt: new Date(Date.now() - 10000),
-  },
-  {
-    id: 2,
-    title:
-      "White House on defensive as Manchin raises concerns about new spending",
-    description:
-      "No matter the eventual outcome, there was little sign that the negotiators would achive the kind of sweeping deal to battle back warming that would satisfy the demands of youth activists.",
-    thumbnail: Image,
-    author: [{ id: "author-01", name: "PiKayQi" }],
-    publishedAt: new Date(Date.now() - 10000),
-  },
-  {
-    id: 3,
-    title:
-      "White House on defensive as Manchin raises concerns about new spending",
-    description:
-      "No matter the eventual outcome, there was little sign that the negotiators would achive the kind of sweeping deal to battle back warming that would satisfy the demands of youth activists.",
-    thumbnail: Image,
-    author: [
-      { id: "author-01", name: "PiKayQi" },
-      { id: "author-02", name: "Tuan" },
-    ],
-    publishedAt: new Date(Date.now() - 10000),
-  },
-];
+// const articles = [
+//   {
+//     id: 1,
+//     title:
+//       "White House on defensive as Manchin raises concerns about new spending",
+//     description:
+//       "No matter the eventual outcome, there was little sign that the negotiators would achive the kind of sweeping deal to battle back warming that would satisfy the demands of youth activists.",
+//     thumbnail: Image,
+//     author: [
+//       { id: "author-01", name: "PiKayQi" },
+//       { id: "author-02", name: "Tuan" },
+//     ],
+//     publishedAt: new Date(Date.now() - 10000),
+//   },
+//   {
+//     id: 2,
+//     title:
+//       "White House on defensive as Manchin raises concerns about new spending",
+//     description:
+//       "No matter the eventual outcome, there was little sign that the negotiators would achive the kind of sweeping deal to battle back warming that would satisfy the demands of youth activists.",
+//     thumbnail: Image,
+//     author: [{ id: "author-01", name: "PiKayQi" }],
+//     publishedAt: new Date(Date.now() - 10000),
+//   },
+//   {
+//     id: 3,
+//     title:
+//       "White House on defensive as Manchin raises concerns about new spending",
+//     description:
+//       "No matter the eventual outcome, there was little sign that the negotiators would achive the kind of sweeping deal to battle back warming that would satisfy the demands of youth activists.",
+//     thumbnail: Image,
+//     author: [
+//       { id: "author-01", name: "PiKayQi" },
+//       { id: "author-02", name: "Tuan" },
+//     ],
+//     publishedAt: new Date(Date.now() - 10000),
+//   },
+// ];
 
 const keywords = [
   {
@@ -245,7 +245,7 @@ function Homepage({}: HomepageProps) {
             </TabsList>
             <TabsContent value="trending-topic">
               {keywords.map((item, index) => (
-                <div className="flex items-stretch gap-4 py-5 border-b-2 border-gray-300">
+                <div key={index} className="flex items-stretch gap-4 py-5 border-b-2 border-gray-300">
                   <div className="text-foreground-gray font-second">
                     <span className="text-xl font-bold">#</span>
                     <span className="text-5xl leading-7">{item.ranking}</span>
@@ -440,7 +440,7 @@ function Homepage({}: HomepageProps) {
             </div>
           </div>
           <div className="col-span-2 border-l-2 border-r-2 border-gray-300 px-4 flex flex-col gap-4">
-            {[...Array(5)].map((item, index) => (
+            {[...Array(5)].map((_, index) => (
               <div
                 key={index}
                 className={cn(
@@ -475,7 +475,7 @@ function Homepage({}: HomepageProps) {
             ))}
           </div>
           <div className="col-span-1 flex flex-col justify-between">
-            {[...Array(7)].map((item, index) => (
+            {[...Array(7)].map((_, index) => (
               <div
                 key={index}
                 className="flex items-center gap-2 pb-4 border-b-2 border-gray-300"
@@ -500,7 +500,7 @@ function Homepage({}: HomepageProps) {
           <div className="flex-1 h-0.5 bg-foreground rounded-full"></div>
         </div>
         <div className="grid grid-cols-3 gap-8 items-stretch justify-start mt-10">
-          {[...Array(3)].map((item, index) => (
+          {[...Array(3)].map((_, index) => (
             <div key={index} className="col-span-1 flex flex-col gap-4">
               <div className="h-56">
                 <img src={Image} alt="" />
@@ -529,8 +529,8 @@ function Homepage({}: HomepageProps) {
             </div>
           ))}
           <div className="col-span-3 grid grid-cols-4 items-stretch gap-10 border-y-2 border-gray-300 py-8">
-            {[...Array(4)].map((item, index) => (
-              <div className="flex items-start gap-2">
+            {[...Array(4)].map((_, index) => (
+              <div key={index} className="flex items-start gap-2">
                 <div className="w-20 h-20">
                   <img src={Image} alt="" />
                 </div>

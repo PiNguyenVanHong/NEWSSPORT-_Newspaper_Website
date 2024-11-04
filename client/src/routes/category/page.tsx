@@ -53,8 +53,8 @@ function CategoryNewsPage() {
               and <span className="text-foreground-red">PiKayQi</span>
             </div>
           </div>
-          {[...Array(2)].map((item, index) => (
-            <div className="col-span-1 flex flex-col gap-4 p-10 border border-foreground-gray">
+          {[...Array(2)].map((_i, index) => (
+            <div key={index} className="col-span-1 flex flex-col gap-4 p-10 border border-foreground-gray">
               <div className="flex items-center gap-4">
                 <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
                   sport
@@ -86,7 +86,7 @@ function CategoryNewsPage() {
           <h1 className="text-2xl uppercase font-semibold">
             Most-Read Stories
           </h1>
-          {[...Array(6)].map((item, index) => (
+          {[...Array(6)].map((_i, index) => (
             <div
               key={index}
               className={cn(
@@ -109,8 +109,8 @@ function CategoryNewsPage() {
             </div>
           ))}
         </div>
-        {[...Array(3)].map((item, index) => (
-          <div className="col-span-1 flex flex-col gap-4 p-10 border border-foreground-gray">
+        {[...Array(3)].map((_i, index) => (
+          <div key={index} className="col-span-1 flex flex-col gap-4 p-10 border border-foreground-gray">
             <div className="flex items-center gap-4">
               <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
                 sport
@@ -197,15 +197,15 @@ function CategoryNewsPage() {
       </div>
       <div className="grid grid-cols-3 items-stretch border border-foreground-gray my-20">
         <div className="col-span-3 flex items-center justify-between p-10 border border-foreground-gray bg-white">
-          {[...Array(4)].map((item, index) => (
+          {[...Array(4)].map((_i, index) => (
             <>
               {index !== 0 && <div className="font-semibold text-xl">/</div>}
               <h1 className="uppercase text-3xl font-medium">Football match</h1>
             </>
           ))}
         </div>
-        {[...Array(3)].map((item, index) => (
-          <div className="col-span-1 min-h-[700px] h-full flex flex-col justify-between p-10 border border-foreground-gray">
+        {[...Array(3)].map((_i, index) => (
+          <div key={index} className="col-span-1 min-h-[700px] h-full flex flex-col justify-between p-10 border border-foreground-gray">
             <div className="flex items-center gap-4">
               <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
                 sport
@@ -233,7 +233,7 @@ function CategoryNewsPage() {
           </div>
         ))}
         <div className="col-span-3 flex items-center justify-between p-10 border border-foreground-gray bg-white">
-          {[...Array(4)].map((item, index) => (
+          {[...Array(4)].map((_, index) => (
             <>
               {index !== 0 && <div className="font-semibold text-xl">/</div>}
               <h1 className="uppercase text-3xl font-medium">
@@ -242,8 +242,8 @@ function CategoryNewsPage() {
             </>
           ))}
         </div>
-        {[...Array(3)].map((item, index) => (
-          <div className="col-span-1 min-h-[700px] h-full flex flex-col justify-between p-10 border border-foreground-gray">
+        {[...Array(3)].map((_, index) => (
+          <div key={index} className="col-span-1 min-h-[700px] h-full flex flex-col justify-between p-10 border border-foreground-gray">
             <div className="flex items-center gap-4">
               <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
                 sport

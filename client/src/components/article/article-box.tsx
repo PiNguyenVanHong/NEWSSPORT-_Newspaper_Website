@@ -13,7 +13,6 @@ interface ArticleBoxProps {
 }
 
 const ArticleBox = ({
-  category,
   title,
   author1,
   author2,

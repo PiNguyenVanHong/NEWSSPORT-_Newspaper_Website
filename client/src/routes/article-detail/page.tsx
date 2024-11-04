@@ -114,7 +114,7 @@ function ArticleDetailPage() {
             <h1 className="uppercase text-2xl font-semibold">
               More retrospective
             </h1>
-            {[...Array(3)].map((item, index) => (
+            {[...Array(3)].map((_i, index) => (
               <div key={index} className="flex flex-col gap-4 items-start">
                 <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
                   sport
@@ -142,7 +142,7 @@ function ArticleDetailPage() {
             <h1 className="uppercase text-2xl font-semibold">
               Most-read Stories
             </h1>
-            {[...Array(3)].map((item, index) => (
+            {[...Array(3)].map((_i, index) => (
               <div
                 key={index}
                 className={cn(
@@ -168,15 +168,15 @@ function ArticleDetailPage() {
       </div>
       <div className="grid grid-cols-3 items-stretch border border-foreground-gray mt-14 mb-10">
         <div className="col-span-3 flex items-center justify-between p-10 border border-foreground-gray bg-white">
-          {[...Array(4)].map((item, index) => (
+          {[...Array(4)].map((_i, index) => (
             <>
               {index !== 0 && <div className="font-semibold text-xl">/</div>}
               <h1 className="uppercase text-3xl font-medium">Football match</h1>
             </>
           ))}
         </div>
-        {[...Array(3)].map((item, index) => (
-          <div className="col-span-1 min-h-[620px] h-full flex flex-col justify-between p-10 border border-foreground-gray">
+        {[...Array(3)].map((_i, index) => (
+          <div key={index} className="col-span-1 min-h-[620px] h-full flex flex-col justify-between p-10 border border-foreground-gray">
             <div className="flex items-center gap-4">
               <div className="uppercase py-1 text-foreground-red font-medium">
                 sport

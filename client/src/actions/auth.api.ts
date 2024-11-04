@@ -1,5 +1,5 @@
 import { GET_ME_ROUTE, LOG_OUT_ROUTE, LOGIN_ROUTE, REGISTER_ROUTE, requestClient, VERIFY_REGISTER_ROUTE } from "@/actions/api.route";
-import { getToken } from "@/lib/utils";
+// import { getToken } from "@/lib/utils";
 import { AuthRegister } from "@/types/auth.type";
 
 export type AuthMeType = {

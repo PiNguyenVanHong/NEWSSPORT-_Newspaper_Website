@@ -79,7 +79,7 @@ function VerifyPage() {
                   <FormControl>
                     <InputOTP maxLength={6} {...field}>
                       <InputOTPGroup className="w-full flex gap-4 items-center">
-                        {[...Array(6)].map((item, index) => (
+                        {[...Array(6)].map((_, index) => (
                           <InputOTPSlot
                             key={index}
                             className="w-20 h-24 bg-white text-xl"
