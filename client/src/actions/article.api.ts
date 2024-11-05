@@ -1,4 +1,4 @@
-import { ARTICLE_ROUTES, requestClient } from "@/actions/api.route";
+import { ARTICLE_ROUTES, HeaderConfig, requestClient } from "@/actions/api.route";
 import { getToken } from "@/lib/utils";
 import { ArticleRequest } from "@/types/article.type";
 
@@ -626,25 +626,6 @@ const rootData = {
     },
   ],
   nextPage: "1730054580229611487",
-};
-
-const HeaderConfig = (token: string, isFile: boolean) => {
-  if (isFile) {
-    return {
-      headers: {
-        Accept: "application/json",
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${token}`,
-      },
-    };
-  } else {
-      return {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      };
-  }
 };
 
 export const getTopArticles = () => {

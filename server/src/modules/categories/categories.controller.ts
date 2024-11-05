@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 
 import { Public } from '@/decorator/auth.decorator';
 import { Roles } from '@/decorator/roles.decorator';
@@ -19,8 +19,8 @@ export class CategoriesController {
 
   @Get()
   @Public()
-  findAll() {
-    return this.categoriesService.findAll();
+  findAll(@Query() query: string) {
+    return this.categoriesService.findAll(query);
   }
 
   @Get(':id')

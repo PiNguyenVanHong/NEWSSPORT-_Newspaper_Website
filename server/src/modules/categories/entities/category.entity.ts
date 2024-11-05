@@ -18,6 +18,12 @@ export class Category {
   @Column()
   description: string;
 
+  @Column()
+  alias: string;
+
+  @Column()
+  level: number;
+
   @Column({ default: false })
   isDeleted: boolean;
 

@@ -32,7 +32,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Editor from "@/components/editor";
 import HeaderAction from "@/components/dashboard/header-action";
 import { getAllCategory } from "@/actions/category.api";
 import { CategoryResponse } from "@/types/category.type";
@@ -40,6 +39,7 @@ import { toast } from "sonner";
 import { createArticle } from "@/actions/article.api";
 import { ArticleRequest } from "@/types/article.type";
 import { AxiosError } from "axios";
+import ContentArticle from "@/components/article/content";
 
 function DashboardCreateArticlePage() {
   const breadcrumbs = [
@@ -81,10 +81,8 @@ function DashboardCreateArticlePage() {
 
   const onSubmit = async (values: z.infer<typeof formArticleSchema>) => {
     try {
-      console.log(JSON.parse(content));
-      return;
       setIsLoading(true);
-      if(content.trim().length <= 0 ) {
+      if (content.trim().length <= 0) {
         toast.error("Please finish your content!!!");
         return;
       }
@@ -94,8 +92,8 @@ function DashboardCreateArticlePage() {
         content: content,
         description: values.description,
         link: "",
-        categoryId: values.categoryId
-      }; 
+        categoryId: values.categoryId,
+      };
       const formData = new FormData();
       formData.append("thumbnail", values.thumbnail[0]);
 
@@ -104,7 +102,7 @@ function DashboardCreateArticlePage() {
 
       toast.success(message);
     } catch (error) {
-      if(error instanceof AxiosError)
+      if (error instanceof AxiosError)
         toast.error(error?.response?.data?.message);
       else {
         console.log(error);
@@ -207,8 +205,11 @@ function DashboardCreateArticlePage() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {categories.map((item) => (
-                                    <SelectItem key={item.id} value={item.id}>
+                                  {categories.map((item, index) => (
+                                    <SelectItem
+                                      key={item.id || index}
+                                      value={item.id!}
+                                    >
                                       {item.name}
                                     </SelectItem>
                                   ))}
@@ -248,7 +249,9 @@ function DashboardCreateArticlePage() {
                   </SidebarGroupContent>
                 </SidebarGroup>
 
-                <Button className="w-full" disabled={isLoading}>Create</Button>
+                <Button className="w-full" disabled={isLoading}>
+                  Create
+                </Button>
               </form>
             </Form>
           </SidebarContent>
@@ -266,7 +269,10 @@ function DashboardCreateArticlePage() {
                 </Button>
               </div>
               <div className="flex flex-1 flex-col gap-4 px-4 py-4">
-                <Editor onChange={onChange} initialContent={undefined} />
+                <ContentArticle
+                  onChange={onChange}
+                  initialContent={undefined}
+                />
               </div>
             </div>
           </main>

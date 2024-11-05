@@ -4,7 +4,7 @@ export const HOST = import.meta.env.VITE_PUBLIC_BACKEND_URL;
 
 const AUTH_ROUTES = `${HOST}/api/auth`;
 // const USER_ROUTES = `${HOST}/api/users`;
-const CATEGORY_ROUTES = `${HOST}/api/categories`;
+export const CATEGORY_ROUTES = `${HOST}/api/categories`;
 export const ARTICLE_ROUTES = `${HOST}/api/articles`;
 
 export const LOGIN_ROUTE = `${AUTH_ROUTES}/login`;
@@ -21,3 +21,22 @@ export const requestClient = axios.create({
   timeout: 20000,
   withCredentials: true,
 });
+
+export const HeaderConfig = (token: string, isFile: boolean) => {
+  if (isFile) {
+    return {
+      headers: {
+        Accept: "application/json",
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    };
+  } else {
+      return {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
+  }
+};

@@ -1,5 +1,8 @@
-import { Repository } from 'typeorm';
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import aqp from 'api-query-params';
+import {
+  Repository,
+} from 'typeorm';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { CreateCategoryDto } from '@/modules/categories/dto/create-category.dto';
@@ -9,32 +12,41 @@ import { Category } from '@/modules/categories/entities/category.entity';
 @Injectable()
 export class CategoriesService {
   constructor(
-    @InjectRepository(Category) private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
-    const { name, description } = createCategoryDto;
+    const { name, description, alias, level } = createCategoryDto;
 
     const category = this.categoryRepository.create({
-      name, description
+      name,
+      description,
+      alias,
+      level,
     });
 
-    const newCategory = await this.categoryRepository.save(category);
+    await this.categoryRepository.insert(category);
 
-    return { id: newCategory.id };
+    return { message: "Create category sucessfully!!!" };
   }
 
-  async findAll() {
-    const categoies = await this.categoryRepository.find({ 
-      select: ['id', 'name', 'description']
-    });  
+  async findAll(query: string) {
+    const { filter, skip, sort, projection } = aqp(query);
+
+    const categoies = await this.categoryRepository.find({
+      select: projection,
+      skip,
+      where: filter,
+      order: sort,
+    });
     return categoies;
   }
 
   async findOne(id: string) {
     const category = await this.categoryRepository.findOneBy({ id });
-    if(!category) {
-      throw new NotFoundException("Your category not found!!!")
+    if (!category) {
+      throw new NotFoundException('Your category not found!!!');
     }
 
     return category;

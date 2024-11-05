@@ -1,16 +1,23 @@
-import { GET_ALL_CATEGORY, requestClient } from "@/actions/api.route";
+import { CATEGORY_ROUTES, GET_ALL_CATEGORY, HeaderConfig, requestClient } from "@/actions/api.route";
+import { getToken } from "@/lib/utils";
+import { CategoryRequest } from "@/types/category.type";
 
-// const HeaderConfig = (token: string) => {
-//   return {
-//     headers: {
-//       Accept: "application/json",
-//       Authorization: `Bearer ${token}`,
-//     },
-//   };
-// };
+export const getAllCategory = async (query?: string) => {
+  if (!query) query = "";
 
-export const getAllCategory = async () => {
-  const { data } = await requestClient.get(GET_ALL_CATEGORY);
+  const { data } = await requestClient.get(GET_ALL_CATEGORY + query);
 
   return data;
 };
+
+export const createCategory = async (body: CategoryRequest) => {
+  const token = await getToken();
+
+  const { data } = await requestClient.post(
+    CATEGORY_ROUTES, 
+    body, 
+    HeaderConfig(token, false)
+  );
+
+  return data;
+}

@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { articleDetailPageLoader } from "@/lib/loader";
+import { articleDetailPageLoader, categoryDashboardPageLoader } from "@/lib/loader";
 
 import Homepage from "@/routes/homepage/page";
 import CategoryNewsPage from "@/routes/category/page";
@@ -10,9 +10,11 @@ import SignInPage from "@/routes/sign-in/page";
 import SignUpPage from "@/routes/sign-up/page";
 import VerifyPage from "@/routes/verify/page";
 import DashboardPage from "@/routes/dashboard/page";
+import TestTablePage from "@/routes/test-table/page";
 import DashboardCategoryPage from "@/routes/dashboard/category/page";
 import DashboardArticlePage from "@/routes/dashboard/article/page";
 import DashboardCreateArticlePage from "@/routes/dashboard/article/create/page";
+import DashboardCreateCategoryPage from "@/routes/dashboard/category/create/page";
 
 import LayoutPage from "@/components/layout/layout";
 import AuthLayoutPage from "@/components/layout/auth-layout";
@@ -61,7 +63,12 @@ function App() {
         },
         {
           path: "/dashboard/categories",
-          element: <DashboardCategoryPage />
+          element: <DashboardCategoryPage />,
+          loader: categoryDashboardPageLoader,
+        },
+        {
+          path: "/dashboard/categories/create",
+          element: <DashboardCreateCategoryPage  />
         },
         {
           path: "/dashboard/articles",
@@ -70,6 +77,10 @@ function App() {
         {
           path: "/dashboard/articles/create",
           element: <DashboardCreateArticlePage  />
+        },
+        {
+          path: "/dashboard/test-table",
+          element: <TestTablePage  />
         },
       ]
     },

@@ -149,7 +149,7 @@ const AuthCarousel = () => {
       autoPlay
       autoPlayControls
       autoPlayStrategy="none"
-      autoPlayInterval={6000}
+      autoPlayInterval={3000}
       animationType="fadeout"
       animationDuration={800}
       disableButtonsControls

@@ -6,4 +6,10 @@ export class CreateCategoryDto {
 
     @IsOptional()
     description: string;
+
+    @IsNotEmpty()
+    alias: string;
+
+    @IsNotEmpty()
+    level: number;
 }

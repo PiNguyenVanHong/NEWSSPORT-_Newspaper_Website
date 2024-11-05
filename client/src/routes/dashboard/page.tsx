@@ -1,4 +1,8 @@
+import { ContentTemp } from "@/components/dashboard/content-temp";
 import HeaderAction from "@/components/dashboard/header-action";
+import { ChartCircle01 } from "@/components/dashboard/options/circle-01";
+import { ChartCircle02 } from "@/components/dashboard/options/circle-02";
+import { ChartCircle03 } from "@/components/dashboard/options/circle-03";
 
 function DashboardPage() {
   const breadcrumbs = [{ label: "Pages", link: "/" }, { label: "Dashboard" }];
@@ -9,12 +13,12 @@ function DashboardPage() {
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <h3>Dashboard</h3>
         <span>Check the sales, value and bounce rate by country</span>
-        <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-          <div className="aspect-video rounded-xl bg-muted/50" />
-          <div className="aspect-video rounded-xl bg-muted/50" />
-          <div className="aspect-video rounded-xl bg-muted/50" />
+        <div className="w-full grid grid-cols-3 items-start gap-6 mb-4">
+          <ChartCircle02 />
+          <ChartCircle01 />
+          <ChartCircle03 />
         </div>
-        <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
+          <ContentTemp />
       </div>
     </div>
   );
