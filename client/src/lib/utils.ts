@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { jwtDecode } from "jwt-decode";
+import slug from "slug";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -13,6 +14,17 @@ export async function getToken() {
 export function decodedToken(token: string) {
   return jwtDecode(token);
 }
+
+export const generateSlug = (title: string, id: string) => {
+  const rst = slug(title) + "-ar" + id + ".html";
+  return rst;
+};
+
+export const getIdFromSlug = (pathname: string) => {
+  const str = pathname.split(".html")[0].split("-");
+
+  return str[str.length - 1].replace("ar", "");
+};
 
 
 export interface QueryObject {

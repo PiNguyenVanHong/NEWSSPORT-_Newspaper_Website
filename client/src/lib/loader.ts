@@ -1,16 +1,25 @@
+import { buildQueryString, getIdFromSlug } from "@/lib/utils";
 import { getAllCategory } from "@/actions/category.api";
-import { buildQueryString } from "./utils";
+import { getAllArticle, getArticleById } from "@/actions/article.api";
 
 export const articleDetailPageLoader = async ({ params }: any) => {
-  const alias = params.alias;
-  return alias;
+  try {
+    const alias = params.alias;
+    const id = getIdFromSlug(alias);
+    
+    const { result } = await getArticleById(id);
+
+    return { alias, article: result };
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 };
 
 export const categoryDashboardPageLoader = async () => {
   try {
     const query = buildQueryString({
-      filter: {
-      },
+      filter: {},
       projection: {
         id: 1,
         name: 1,
@@ -21,11 +30,21 @@ export const categoryDashboardPageLoader = async () => {
       },
       sort: {
         level: 1,
-      }
+      },
     });
 
     const data = await getAllCategory(query);
 
+    return data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+export const dataHomepage = async () => {
+  try {
+    const data = await getAllArticle();
     return data;
   } catch (error) {
     console.log(error);

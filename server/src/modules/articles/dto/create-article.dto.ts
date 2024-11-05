@@ -4,7 +4,7 @@ export class CreateArticleDto {
     @IsNotEmpty()
     title: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     description: string;
 
     @IsOptional()

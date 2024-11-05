@@ -4,8 +4,10 @@ import { useEffect } from "react";
 import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { animatePageIn } from "@/lib/animations";
-import { formatDatePublish, formatDateBasis } from "@/lib/format";
+import { formatDatePublish, formatDateBasis, formatUrlImage, formatDateInTimeZone } from "@/lib/format";
 import BreadcrumbCustom from "@/components/breadcumb-custom";
+import { ArticleResponse } from "@/types/article.type";
+import ContentArticle from "@/components/article/content";
 
 const socials = [
   { id: 1, name: "Facebook", link: "/" },
@@ -23,22 +25,22 @@ const topics = [
   { label: "Pre-raphaelites", link: "/" },
 ];
 
-const breadcrumbs = [
-  { label: "Homepage", link: "/" },
-  { label: "dadsa", link: "/" },
-  { label: "24234", link: "/" },
-  { label: "Sports", link: "/" },
-  { label: "abc xyz tsz" },
-];
-
 const FORMAT_DATE = "MMM dd, yyyy hh:mm aaa";
 
 function ArticleDetailPage() {
   const navigate = useNavigate();
-  const data = useLoaderData() as string;
+  const { alias, article }: { alias: string, article: ArticleResponse} = useLoaderData() as any;
+
+  const breadcrumbs = [
+    { label: "Homepage", link: "/" },
+    { label: "dadsa", link: "/" },
+    { label: "24234", link: "/" },
+    { label: "Sports", link: "/" },
+    { label: article.title },
+  ];
 
   useEffect(() => {
-    if (!data.includes(".html")) navigate("/404");
+    if (!alias.includes(".html")) navigate("/404");
     animatePageIn();
   }, []);
 
@@ -50,7 +52,7 @@ function ArticleDetailPage() {
       <div className="grid grid-cols-3 border border-foreground-gray">
         <div className="col-span-3">
           <div className="w-full h-[450px]">
-            <img src={Image} alt="" />
+            <img src={formatUrlImage(article.thumbnail!)} alt="" />
           </div>
         </div>
         <div className="col-span-2 flex flex-col justify-between">
@@ -60,14 +62,14 @@ function ArticleDetailPage() {
                 sport
               </div>
               <div className="text-foreground-gray font-medium uppercase">
-                {formatDateBasis(new Date(Date.now() - 30000), FORMAT_DATE)}
+                {formatDateBasis(new Date(article.createdAt!), FORMAT_DATE)}
+                {/* {formatDateInTimeZone(article.createdAt!, FORMAT_DATE)} */}
               </div>
             </div>
             <h2 className="text-3xl">
-              On the 'Noble Failure' of the Pre-Raphaelites, a Group Long Held
-              in 'Generally Low Repute,' in 1964
+              {article.title}
             </h2>
-            <div className="w-full h-96">
+            {/* <div className="w-full h-96">
               <img src={Image} alt="" />
             </div>
             <div>
@@ -75,7 +77,13 @@ function ArticleDetailPage() {
               officia a iusto eaque nemo sed minima modi nam repellendus odit
               incidunt voluptates, et voluptatum repellat natus saepe fuga
               aspernatur amet?
-            </div>
+            </div> */}
+              <ContentArticle
+                onChange={() => {}}
+                editable={false}
+                initialContent={article.content}
+                className="bg-transparent"
+              />
           </div>
           <div className="grid grid-cols-2 items-stretch">
             <div className="col-span-1 border border-foreground-gray px-10 py-5 flex items-center gap-6">
@@ -84,7 +92,7 @@ function ArticleDetailPage() {
               </div>
               <div className="flex flex-col gap-2 items-start">
                 <div className="text-foreground-gray font-medium">Author</div>
-                <div className="font-semibold">PiKayQi Nguyen</div>
+                <div className="font-semibold capitalize">{article.user.firstName} {article.user.lastName}</div>
               </div>
             </div>
             <div className="col-span-1 border border-foreground-gray flex items-center justify-center">
@@ -176,7 +184,10 @@ function ArticleDetailPage() {
           ))}
         </div>
         {[...Array(3)].map((_i, index) => (
-          <div key={index} className="col-span-1 min-h-[620px] h-full flex flex-col justify-between p-10 border border-foreground-gray">
+          <div
+            key={index}
+            className="col-span-1 min-h-[620px] h-full flex flex-col justify-between p-10 border border-foreground-gray"
+          >
             <div className="flex items-center gap-4">
               <div className="uppercase py-1 text-foreground-red font-medium">
                 sport

@@ -1,4 +1,8 @@
-import { ARTICLE_ROUTES, HeaderConfig, requestClient } from "@/actions/api.route";
+import {
+  ARTICLE_ROUTES,
+  HeaderConfig,
+  requestClient,
+} from "@/actions/api.route";
 import { getToken } from "@/lib/utils";
 import { ArticleRequest } from "@/types/article.type";
 
@@ -639,21 +643,39 @@ export const getTopArticles = () => {
 
 export const createArticle = async (
   body: ArticleRequest,
-  formData: FormData,
+  formData: FormData
 ) => {
-    const token = await getToken();
+  const token = await getToken();
 
   const { data }: any = await requestClient.post(
-    ARTICLE_ROUTES, 
-    body, 
-    HeaderConfig(token, false),
+    ARTICLE_ROUTES,
+    body,
+    HeaderConfig(token, false)
   );
 
   const result = await requestClient.post(
     `${ARTICLE_ROUTES}/uploads/${data.id}`,
     formData,
-    HeaderConfig(token, true),
+    HeaderConfig(token, true)
   );
 
   return result.data;
+};
+
+export const getAllArticle = async (query?: string) => {
+  if(!query) query = "";
+
+  const { data } = await requestClient.get(
+    ARTICLE_ROUTES + query
+  );
+
+  return data;
+};
+
+export const getArticleById = async (id: string) => {
+  const { data } = await requestClient.get(
+    ARTICLE_ROUTES + "/" + id,
+  );
+
+  return data;
 };

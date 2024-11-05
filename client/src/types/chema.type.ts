@@ -41,7 +41,7 @@ const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/web
 
 export const formArticleSchema = z.object({
   title: z.string().min(2, "Please fill the title"),
-  description: z.string().min(2, "Please fill the description"),
+  description: z.string().optional(),
   content: z.string().optional(),
   categoryId: z.string().min(2, "Please choose a category"),
   thumbnail: z

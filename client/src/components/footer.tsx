@@ -106,7 +106,7 @@ const Footer = () => {
         <div className="col-span-2 border-l border-t border-foreground-gray flex items-center justify-center">
           <ul className="flex items-center gap-6 my-4">
             {socials.map((item) => (
-              <li>
+              <li key={item.id}>
                 <Button className="font-normal" variant={"link"}>
                   {item.name}
                 </Button>

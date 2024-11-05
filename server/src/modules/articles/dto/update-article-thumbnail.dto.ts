@@ -2,7 +2,7 @@ import { IsNotEmpty } from "class-validator";
 
 export class UpdateArticleThumbnail {
     @IsNotEmpty()
-    articleId: string;
+    articleId: number;
 
     @IsNotEmpty()
     path: string;

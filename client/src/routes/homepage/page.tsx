@@ -1,13 +1,15 @@
 import Image from "@/assets/news/1.jpg";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, Mail } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { formatDatePublish } from "@/lib/format";
+import { cn, generateSlug } from "@/lib/utils";
+import { formatDatePublish, formatUrlImage } from "@/lib/format";
 import { animatePageIn } from "@/lib/animations";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getTopArticles } from "@/actions/article.api";
+import { getAllArticle, getTopArticles } from "@/actions/article.api";
+import { ArticleResponse } from "@/types/article.type";
+import { useNavigate } from "react-router-dom";
 
 // const articles = [
 //   {
@@ -86,13 +88,28 @@ const hero1 = getTopArticles();
 interface HomepageProps {}
 
 function Homepage({}: HomepageProps) {
+  const [articles, setArticles] = useState<ArticleResponse[]>([]);
+  const navigate = useNavigate();
+
   useEffect(() => {
     animatePageIn();
+
+    const getData = async () => {
+      const { results } = await getAllArticle();
+
+      setArticles(results);
+    };
+
+    getData();
   }, []);
 
   const handleClick = (link: string) => {
     window.open(link);
   };
+
+  const onClick = (title: string, id: string) => {
+    navigate(generateSlug(title, id));
+  }
 
   return (
     <div className="w-full max-w-7xl mx-auto">
@@ -161,7 +178,10 @@ function Homepage({}: HomepageProps) {
         </div>
         <div className="col-span-2 h-full border-2 border-gray-300 p-4">
           <div className="h-full flex flex-col items-center justify-between">
-            <div className="h-full flex flex-col justify-between gap-2" onClick={() => handleClick(hero1[0].link)}>
+            <div
+              className="h-full flex flex-col justify-between gap-2"
+              onClick={() => handleClick(hero1[0].link)}
+            >
               <div className="h-96 relative">
                 <img
                   className="object-cover"
@@ -194,9 +214,17 @@ function Homepage({}: HomepageProps) {
             </div>
             <div className="flex flex-col gap-6 mt-6">
               {[...hero1].slice(1, 3).map((item) => (
-                <div key={item.article_id} className="grid grid-cols-6 gap-4 pt-6 border-t-2 border-gray-300" onClick={() => handleClick(item.link)}>
+                <div
+                  key={item.article_id}
+                  className="grid grid-cols-6 gap-4 pt-6 border-t-2 border-gray-300"
+                  onClick={() => handleClick(item.link)}
+                >
                   <div className="col-span-2">
-                    <img className="object-cover" src={item.image_url || Image} alt="" />
+                    <img
+                      className="object-cover"
+                      src={item.image_url || Image}
+                      alt=""
+                    />
                   </div>
                   <div className="col-span-4 flex flex-col gap-2">
                     <h2>
@@ -217,9 +245,7 @@ function Homepage({}: HomepageProps) {
                         and
                         <span className="text-foreground-red"> Tuan</span>
                       </div>
-                      <div>
-                        {formatDatePublish(new Date(item.pubDate))}
-                      </div>
+                      <div>{formatDatePublish(new Date(item.pubDate))}</div>
                     </div>
                   </div>
                 </div>
@@ -245,7 +271,10 @@ function Homepage({}: HomepageProps) {
             </TabsList>
             <TabsContent value="trending-topic">
               {keywords.map((item, index) => (
-                <div key={index} className="flex items-stretch gap-4 py-5 border-b-2 border-gray-300">
+                <div
+                  key={index}
+                  className="flex items-stretch gap-4 py-5 border-b-2 border-gray-300"
+                >
                   <div className="text-foreground-gray font-second">
                     <span className="text-xl font-bold">#</span>
                     <span className="text-5xl leading-7">{item.ranking}</span>
@@ -261,9 +290,12 @@ function Homepage({}: HomepageProps) {
               Change your password here.
             </TabsContent>
           </Tabs>
-          <div className="flex flex-col gap-2" onClick={() => handleClick(hero1[hero1.length - 1].link)}>
+          <div
+            className="flex flex-col gap-2"
+            onClick={() => handleClick(hero1[hero1.length - 1].link)}
+          >
             <div>
-              <img src={hero1[hero1.length - 1].image_url|| Image} alt="" />
+              <img src={hero1[hero1.length - 1].image_url || Image} alt="" />
             </div>
             <h3>
               {hero1[hero1.length - 1].title}
@@ -500,7 +532,38 @@ function Homepage({}: HomepageProps) {
           <div className="flex-1 h-0.5 bg-foreground rounded-full"></div>
         </div>
         <div className="grid grid-cols-3 gap-8 items-stretch justify-start mt-10">
-          {[...Array(3)].map((_, index) => (
+          {articles.map((item, index) => (
+            <div
+              key={item.id || index}
+              className="col-span-1 flex flex-col gap-4 group"
+              onClick={() => onClick(item.title!, item.id!)}
+            >
+              <div className="h-56 overflow-hidden">
+                <img className="group-hover:scale-110 transition duration-300" src={formatUrlImage(item.thumbnail!)} alt="" />
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="text-foreground-gray font-medium">
+                  {formatDatePublish(new Date(item.createdAt!))}
+                </div>
+                <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
+                  Sports
+                </div>
+              </div>
+              <h2 className="h-12 text-justify">{item.title}</h2>
+              {item.description && (
+                <div className="text-foreground-gray font-normal line-clamp-4 h-20">
+                  {item.description}
+                </div>
+              )}
+              <div className="text-foreground-gray font-medium capitalize">
+                By{" "}
+                <span className="text-foreground-red">
+                  {item.user.firstName} {item.user.lastName}
+                </span>
+              </div>
+            </div>
+          ))}
+          {/* {[...Array(3)].map((_, index) => (
             <div key={index} className="col-span-1 flex flex-col gap-4">
               <div className="h-56">
                 <img src={Image} alt="" />
@@ -527,7 +590,7 @@ function Homepage({}: HomepageProps) {
                 and <span className="text-foreground-red">PiKayQi</span>
               </div>
             </div>
-          ))}
+          ))} */}
           <div className="col-span-3 grid grid-cols-4 items-stretch gap-10 border-y-2 border-gray-300 py-8">
             {[...Array(4)].map((_, index) => (
               <div key={index} className="flex items-start gap-2">

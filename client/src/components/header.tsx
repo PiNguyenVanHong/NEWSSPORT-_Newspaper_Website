@@ -17,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AxiosError } from "axios";
 
 const menu = [
   { id: 1, label: "events", link: "/events" },
@@ -37,7 +38,12 @@ const navbars = [
 ];
 
 const Header = () => {
-  const { userId, role, token, logout: logoutClient }: any = useContext(AuthContext);
+  const {
+    userId,
+    role,
+    token,
+    logout: logoutClient,
+  }: any = useContext(AuthContext);
   const { t, i18n } = useTranslation(["header"]);
   const location = useLocation();
   const navigate = useNavigate();
@@ -52,8 +58,19 @@ const Header = () => {
     }
 
     const getUser = async () => {
-      const userInfo = await getMe(token);
-      setCurrentUser(userInfo);
+      try {
+        const userInfo = await getMe(token);
+        setCurrentUser(userInfo);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          toast.error(error?.response?.data?.message);
+          navigate("/sign-in");
+        }
+        else {
+          console.log(error);
+          toast.error("Something went wrong!!!");
+        }
+      }
     };
 
     getUser();
@@ -144,7 +161,9 @@ const Header = () => {
                     <DropdownMenuItem>Profile</DropdownMenuItem>
                     <DropdownMenuItem>Billing</DropdownMenuItem>
                     <DropdownMenuItem>Team</DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout}>
+                      Logout
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>

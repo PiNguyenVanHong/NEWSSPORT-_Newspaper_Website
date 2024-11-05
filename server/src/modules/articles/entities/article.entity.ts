@@ -11,8 +11,8 @@ import {
 
 @Entity({ name: "articles" })
 export class Article {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
   title: string;
@@ -29,7 +29,7 @@ export class Article {
   @Column({ nullable: true })
   thumbnail: string;
   
-  @Column('datetime', { nullable: true })
+  @Column('timestamp', { nullable: true })
   pubDate: Date;
 
   @Column()
@@ -38,7 +38,7 @@ export class Article {
   @Column({ default: false })
   isDeleted: boolean;
 
-  @Column('datetime', { nullable: true })
+  @Column('timestamp', { nullable: true })
   deletedAt: Date;
 
   @Column('datetime')

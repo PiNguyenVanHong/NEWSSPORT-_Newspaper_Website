@@ -4,17 +4,20 @@ import "@blocknote/core/fonts/inter.css";
 import { BlockNoteEditor, PartialBlock } from "@blocknote/core";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
+import { cn } from "@/lib/utils";
 
 interface ContentArticleProps {
   onChange: (value: string) => void;
   initialContent?: string;
   editable?: boolean;
+  className?: string;
 }
 
 function ContentArticle({
   onChange,
   initialContent,
   editable,
+  className,
 }: ContentArticleProps) {
   const editor: BlockNoteEditor = useCreateBlockNote({
     initialContent: initialContent
@@ -24,7 +27,7 @@ function ContentArticle({
   });
 
   return (
-    <div className="mx-auto h-full w-full max-w-5xl rounded-xl bg-white p-4">
+    <div className={cn("mx-auto h-full w-full max-w-5xl rounded-xl p-4", className)}>
       <BlockNoteView
         editor={editor}
         editable={editable}
@@ -32,6 +35,7 @@ function ContentArticle({
         onChange={() => {
           onChange(JSON.stringify(editor.document, null, 2));
         }}
+        className={className}
       />
     </div>
   );

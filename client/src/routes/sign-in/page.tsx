@@ -42,7 +42,7 @@ function SignInPage() {
   
       const { accessToken } = await login(email, password);
   
-      updateToken(accessToken);
+      await updateToken(accessToken);
       handleClose();
   
       toast.success("Login Successfully.");

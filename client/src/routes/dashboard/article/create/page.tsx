@@ -200,7 +200,7 @@ function DashboardCreateArticlePage() {
                                 defaultValue={field.value}
                               >
                                 <FormControl>
-                                  <SelectTrigger className="bg-white">
+                                  <SelectTrigger className="bg-white capitalize">
                                     <SelectValue placeholder="Select a category" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -208,6 +208,7 @@ function DashboardCreateArticlePage() {
                                   {categories.map((item, index) => (
                                     <SelectItem
                                       key={item.id || index}
+                                      className="capitalize"
                                       value={item.id!}
                                     >
                                       {item.name}
@@ -272,6 +273,7 @@ function DashboardCreateArticlePage() {
                 <ContentArticle
                   onChange={onChange}
                   initialContent={undefined}
+                  className="bg-white"
                 />
               </div>
             </div>

@@ -49,7 +49,7 @@ export const AuthContextProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     if (token !== undefined)
       localStorage.setItem("token", JSON.stringify(token));
-  }, [userId]);
+  }, [token]);
 
   return (
     <AuthContext.Provider value={{ userId, role, token, updateToken, logout }}>

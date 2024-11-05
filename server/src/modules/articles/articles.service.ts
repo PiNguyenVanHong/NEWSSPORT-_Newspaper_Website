@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +11,7 @@ import { Repository } from 'typeorm';
 import { CategoriesService } from '../categories/categories.service';
 import { UsersService } from '../users/users.service';
 import { UpdateArticleThumbnail } from './dto/update-article-thumbnail.dto';
+import aqp from 'api-query-params';
 
 @Injectable()
 export class ArticlesService {
@@ -18,10 +23,11 @@ export class ArticlesService {
   ) {}
 
   async create(createArticleDto: CreateArticleDto) {
-    const { title, description, content, link, categoryId, userId } = createArticleDto;
+    const { title, description, content, link, categoryId, userId } =
+      createArticleDto;
 
-    if(!userId) {
-      throw new BadRequestException("Please, login your account!!!");
+    if (!userId) {
+      throw new BadRequestException('Please, login your account!!!');
     }
 
     const category = await this.categoryService.findOne(categoryId);
@@ -34,6 +40,8 @@ export class ArticlesService {
       content,
       link,
       status: 'PENDING',
+      createdAt: new Date(),
+      updatedAt: new Date(),
       category,
       user,
     });
@@ -58,11 +66,31 @@ export class ArticlesService {
     return { message: 'Create article successfully' };
   }
 
-  async findAll() {
-    return await this.articleRepository.find();
+  async findAll(query: string) {
+    const { filter, skip, sort, projection } = aqp(query);
+
+    const articles = await this.articleRepository
+      .createQueryBuilder('article')
+      .leftJoinAndSelect('article.user', 'user')
+      .select([
+        'article.id',
+        'article.title',
+        'article.description',
+        'article.link',
+        'article.content',
+        'article.thumbnail',
+        'article.pubDate',
+        'article.createdAt',
+        'user.firstName',
+        'user.lastName',
+        'user.avatar',
+      ])
+      .getMany();
+
+    return { results: articles };
   }
 
-  async findAllOne(id: string) {
+  async findAllOne(id: number) {
     const article = await this.articleRepository.findOneBy({ id });
 
     if (!article) {
@@ -72,7 +100,7 @@ export class ArticlesService {
     return article;
   }
 
-  async isExist(id: string) {
+  async isExist(id: number) {
     const isExist = await this.articleRepository.existsBy({ id });
 
     if (!isExist) {
@@ -82,8 +110,56 @@ export class ArticlesService {
     return isExist;
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} article`;
+  async findOne(id: number, query: string) {
+    const { filter, skip, sort, projection } = aqp(query);
+
+    if (query.length >= 0) {
+      return { result: null };
+    } else {
+      const result = await this.articleRepository
+        .createQueryBuilder('article')
+        .leftJoinAndSelect('article.user', 'user')
+        .select([
+          'article.id',
+          'article.title',
+          'article.description',
+          'article.link',
+          'article.content',
+          'article.thumbnail',
+          'article.pubDate',
+          'article.createdAt',
+          'user.firstName',
+          'user.lastName',
+          'user.avatar',
+        ])
+        .where('article.id = :id', { id })
+        .getOne();
+
+      return { result };
+    }
+  }
+
+  async findOneByCategoryId(categoryId: string) {
+    const result = await this.articleRepository
+      .createQueryBuilder('article')
+      .leftJoinAndSelect('article.category', 'category')
+      .select([
+        'article.id',
+        'article.title',
+        'article.description',
+        'article.link',
+        'article.content',
+        'article.thumbnail',
+        'article.pubDate',
+        'article.createdAt',
+        'user.firstName',
+        'user.lastName',
+        'user.avatar',
+      ])
+      .where('category.id = :categoryId', { categoryId })
+      .getMany();
+
+    return { result };
   }
 
   update(id: number, updateArticleDto: UpdateArticleDto) {
