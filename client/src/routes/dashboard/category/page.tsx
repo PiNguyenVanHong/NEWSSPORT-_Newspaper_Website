@@ -30,8 +30,9 @@ function DashboardCategoryPage() {
     });
 
     const getData = async () => {
-      const categories = await getAllCategory(query);
-      setCategories(categories);
+      const { results } = await getAllCategory(query);
+
+      setCategories(results);
     };
 
     getData();

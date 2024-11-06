@@ -663,19 +663,25 @@ export const createArticle = async (
 };
 
 export const getAllArticle = async (query?: string) => {
-  if(!query) query = "";
+  if (!query) query = "";
 
-  const { data } = await requestClient.get(
-    ARTICLE_ROUTES + query
-  );
+  const { data } = await requestClient.get(ARTICLE_ROUTES + query);
+
+  return data;
+};
+
+export const getAllArticleByCategoryId = async (categoryId: string) => {
+  const { data } = await requestClient.get(ARTICLE_ROUTES, {
+    params: {
+      categoryId,
+    },
+  });
 
   return data;
 };
 
 export const getArticleById = async (id: string) => {
-  const { data } = await requestClient.get(
-    ARTICLE_ROUTES + "/" + id,
-  );
+  const { data } = await requestClient.get(ARTICLE_ROUTES + "/" + id);
 
   return data;
 };

@@ -12,7 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
         const cookieToken = req?.cookies?.accessToken;
 
-        return authHeader || cookieToken;
+        return authHeader;
       },
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_SECRET'),

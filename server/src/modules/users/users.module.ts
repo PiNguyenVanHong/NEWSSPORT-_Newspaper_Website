@@ -25,7 +25,7 @@ import { SocialLink } from '@/modules/social-links/entities/social-link.entity';
             host: configService.get('REDIS_HOST'),
             port: configService.get('REDIS_PORT'),
           },
-          ttl: 3 * 60 * 1000,
+          ttl: 1 * 1000,
          }),
          inject: [ConfigService],
       }),

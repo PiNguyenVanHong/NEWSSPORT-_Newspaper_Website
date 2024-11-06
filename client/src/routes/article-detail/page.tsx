@@ -1,10 +1,14 @@
 import Image from "@/assets/news/1.jpg";
 
-import { useEffect } from "react";
-import { Link, useLoaderData, useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { cn, generateSlug } from "@/lib/utils";
 import { animatePageIn } from "@/lib/animations";
-import { formatDatePublish, formatDateBasis, formatUrlImage, formatDateInTimeZone } from "@/lib/format";
+import {
+  formatDatePublish,
+  formatDateBasis,
+  formatUrlImage,
+} from "@/lib/format";
 import BreadcrumbCustom from "@/components/breadcumb-custom";
 import { ArticleResponse } from "@/types/article.type";
 import ContentArticle from "@/components/article/content";
@@ -27,9 +31,17 @@ const topics = [
 
 const FORMAT_DATE = "MMM dd, yyyy hh:mm aaa";
 
-function ArticleDetailPage() {
+interface ArticleDetailPageProps {
+  alias: string;
+  article: ArticleResponse;
+}
+
+function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
   const navigate = useNavigate();
-  const { alias, article }: { alias: string, article: ArticleResponse} = useLoaderData() as any;
+  const location = useLocation();
+
+  const [data, setData] = useState(article);
+  const divRef = useRef<HTMLDivElement>(null);
 
   const breadcrumbs = [
     { label: "Homepage", link: "/" },
@@ -41,11 +53,19 @@ function ArticleDetailPage() {
 
   useEffect(() => {
     if (!alias.includes(".html")) navigate("/404");
+
+    if (
+      location.pathname.replace("/", "") !==
+      generateSlug(article.title, article.id!)
+    )
+      navigate("/404");
+
     animatePageIn();
-  }, []);
+    divRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [alias, article]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto">
+    <div ref={divRef} className="w-full max-w-7xl mx-auto">
       <div className="mb-10 mt-6">
         <BreadcrumbCustom data={breadcrumbs} />
       </div>
@@ -66,9 +86,7 @@ function ArticleDetailPage() {
                 {/* {formatDateInTimeZone(article.createdAt!, FORMAT_DATE)} */}
               </div>
             </div>
-            <h2 className="text-3xl">
-              {article.title}
-            </h2>
+            <h2 className="text-3xl">{article.title}</h2>
             {/* <div className="w-full h-96">
               <img src={Image} alt="" />
             </div>
@@ -78,12 +96,12 @@ function ArticleDetailPage() {
               incidunt voluptates, et voluptatum repellat natus saepe fuga
               aspernatur amet?
             </div> */}
-              <ContentArticle
-                onChange={() => {}}
-                editable={false}
-                initialContent={article.content}
-                className="bg-transparent"
-              />
+            <ContentArticle
+              onChange={() => {}}
+              editable={false}
+              initialContent={article.content}
+              className="bg-transparent"
+            />
           </div>
           <div className="grid grid-cols-2 items-stretch">
             <div className="col-span-1 border border-foreground-gray px-10 py-5 flex items-center gap-6">
@@ -92,7 +110,9 @@ function ArticleDetailPage() {
               </div>
               <div className="flex flex-col gap-2 items-start">
                 <div className="text-foreground-gray font-medium">Author</div>
-                <div className="font-semibold capitalize">{article.user.firstName} {article.user.lastName}</div>
+                <div className="font-semibold capitalize">
+                  {article.user.firstName} {article.user.lastName}
+                </div>
               </div>
             </div>
             <div className="col-span-1 border border-foreground-gray flex items-center justify-center">

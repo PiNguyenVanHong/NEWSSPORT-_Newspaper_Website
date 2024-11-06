@@ -1,5 +1,6 @@
 import { hashPassword } from '@/helpers/util';
 import { Article } from '@/modules/articles/entities/article.entity';
+import { Favorite } from '@/modules/favorites/entities/favorite.entity';
 import { Role } from '@/modules/roles/entities/role.entity';
 import { SocialLink } from '@/modules/social-links/entities/social-link.entity';
 import { Exclude } from 'class-transformer';
@@ -68,6 +69,9 @@ export class User {
     cascade: true,
   })
   socialLinks: SocialLink[];
+
+  @OneToMany(() => Favorite, (favorite) => favorite.user)
+  favorites: Favorite[];
 
   @BeforeInsert()
   public async hashPassword() {

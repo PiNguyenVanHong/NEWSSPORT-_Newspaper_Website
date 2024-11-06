@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ChevronDown, Search, Slash, UserRound } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import { buildQueryString, cn } from "@/lib/utils";
 import { useModal } from "@/hooks/use-modal-store";
 import { AuthContext } from "@/context/auth-context";
 import { AuthMeType, getMe, logout } from "@/actions/auth.api";
@@ -18,23 +18,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AxiosError } from "axios";
+import { getAllCategory } from "@/actions/category.api";
+import { CategoryResponse } from "@/types/category.type";
 
 const menu = [
   { id: 1, label: "events", link: "/events" },
   { id: 2, label: "breaking news", link: "/breaking-news" },
   { id: 3, label: "about us", link: "/about-us" },
   { id: 4, label: "contact us", link: "/contact-us" },
-];
-
-const navbars = [
-  { id: "nav-01", label: "opinion", link: "/opinion" },
-  { id: "nav-02", label: "business & trends", link: "/business-trends" },
-  { id: "nav-03", label: "politics", link: "/politics" },
-  { id: "nav-04", label: "sports", link: "/sports" },
-  { id: "nav-05", label: "style & experiences", link: "/style-experiences" },
-  { id: "nav-06", label: "sustainability", link: "/sustainability" },
-  { id: "nav-07", label: "academic", link: "/academic" },
-  { id: "nav-08", label: "worlds of luxury", link: "/worlds-of-luxury" },
 ];
 
 const Header = () => {
@@ -50,6 +41,7 @@ const Header = () => {
   const { onOpen } = useModal();
 
   const [currentUser, setCurrentUser] = useState<AuthMeType | null>(null);
+  const [navbars, setNavbars] = useState<CategoryResponse[]>([]);
 
   useEffect(() => {
     if (!token) {
@@ -65,14 +57,42 @@ const Header = () => {
         if (error instanceof AxiosError) {
           toast.error(error?.response?.data?.message);
           navigate("/sign-in");
-        }
-        else {
+        } else {
           console.log(error);
           toast.error("Something went wrong!!!");
         }
       }
     };
 
+    const getNavbar = async () => {
+      try {
+        const query = buildQueryString({
+          filter: {},
+          projection: {
+            id: 1,
+            name: 1,
+            alias: 1,
+          },
+          sort: {
+            level: 1,
+          },
+        });
+
+        const { results } = await getAllCategory(query);
+
+        setNavbars(results);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          toast.error(error?.response?.data?.message);
+          navigate("/sign-in");
+        } else {
+          console.log(error);
+          toast.error("Something went wrong!!!");
+        }
+      }
+    };
+
+    getNavbar();
     getUser();
   }, [token]);
 
@@ -190,13 +210,13 @@ const Header = () => {
             className={cn(
               "px-6 uppercase font-semibold",
               index != 0 && "border-l-2 border-gray-300",
-              location.pathname === t(`header-bottom.${item.label}.link`) &&
+              location.pathname === t(`header-bottom.${item.name}.link`) &&
                 "text-foreground-red"
             )}
           >
             <TransitionLink
-              href={t(`header-bottom.${item.label}.link`)}
-              label={t(`header-bottom.${item.label}.label`)}
+              href={t(`header-bottom.${item.name}.link`)}
+              label={t(`header-bottom.${item.name}.label`)}
             />
           </li>
         ))}

@@ -1,83 +1,93 @@
 import Image from "@/assets/news/1.jpg";
 
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { formatDatePublish } from "@/lib/format";
+import { useNavigate } from "react-router-dom";
+import { formatDatePublish, formatUrlImage } from "@/lib/format";
 import { animatePageIn } from "@/lib/animations";
-import { cn } from "@/lib/utils";
+import { cn, generateSlug } from "@/lib/utils";
+import { CategoryResponse } from "@/types/category.type";
+import { ArticleResponse } from "@/types/article.type";
 
-const pageContent = {
-  "/the-thao": "Thể thao",
-  "/sports": "sports",
-};
+interface CategoryNewsPageProps {
+  category: CategoryResponse;
+  articles: ArticleResponse[];
+}
 
-function CategoryNewsPage() {
-  const location = useLocation();
-  const title =
-    pageContent[location.pathname.toString() as keyof typeof pageContent];
+function CategoryNewsPage({ category, articles }: CategoryNewsPageProps) {
+  const navigate = useNavigate();
 
   useEffect(() => {
     animatePageIn();
-  }, []);
+  }, [category, articles]);
+
+  const onClick = (title: string, id: string) => {
+    navigate(`/${generateSlug(title, id)}`);
+  }
 
   return (
     <div className="w-full max-w-7xl mx-auto">
       <h1 className="text-9xl text-foreground-red font-playfair uppercase font-semibold mb-4">
-        {title}
+        {category.name}
       </h1>
       <div className="grid grid-cols-3 border border-foreground-gray items-stretch">
         <div className="col-span-2 grid grid-cols-2">
-          <div className="col-span-2 flex flex-col gap-4 p-10  border border-foreground-gray">
+          <div 
+            className="col-span-2 flex flex-col gap-4 p-10  border border-foreground-gray" 
+            onClick={() => onClick(articles[0].title, articles[0].id!)}
+          >
             <div className="flex items-center gap-4">
               <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
                 sport
               </div>
               <div className="text-foreground-gray font-medium">
-                {formatDatePublish(new Date(Date.now() - 30000))}
+                {formatDatePublish(new Date(articles[0].createdAt!))}
               </div>
             </div>
             <div className="h-96">
-              <img src={Image} alt="" />
+              <img src={formatUrlImage(articles[0].thumbnail!)} alt="" />
             </div>
             <h2 className="text-3xl">
-              On the 'Noble Failure' of the Pre-Raphaelites, a Group Long Held
-              in 'Generally Low Repute,' in 1964
+              {/* On the 'Noble Failure' of the Pre-Raphaelites, a Group Long Held
+              in 'Generally Low Repute,' in 1964 */}
+              {articles[0].title!}
             </h2>
             <div className="text-foreground-gray font-normal line-clamp-4 h-20">
-              No matter the eventual outcome, there was little sign that the
+              {/* No matter the eventual outcome, there was little sign that the
               negotiators would achive the kind of sweeping deal to battle back
-              warming that would satisfy the demands of youth activists.
+              warming that would satisfy the demands of youth activists. */}
+              {articles[0].description}
             </div>
-            <div className="text-foreground-gray font-medium">
-              By <span className="text-foreground-red">Tuan </span>
-              and <span className="text-foreground-red">PiKayQi</span>
+            <div className="text-foreground-gray font-medium capitalize">
+              By <span className="text-foreground-red">{articles[0].user.firstName}  {articles[0].user.lastName}</span>
+              {/* and <span className="text-foreground-red">PiKayQi</span> */}
             </div>
           </div>
-          {[...Array(2)].map((_i, index) => (
-            <div key={index} className="col-span-1 flex flex-col gap-4 p-10 border border-foreground-gray">
+          {articles.slice(1, 3).map((item, index) => (
+            <div
+              key={item.id ?? index}
+              className="col-span-1 flex flex-col gap-4 p-10 border border-foreground-gray"
+              onClick={() => onClick(item.title, item.id!)}
+            >
               <div className="flex items-center gap-4">
                 <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
                   sport
                 </div>
                 <div className="text-foreground-gray font-medium">
-                  {formatDatePublish(new Date(Date.now() - 30000))}
+                  {formatDatePublish(new Date(item.createdAt!))}
                 </div>
               </div>
               <div className="h-60">
-                <img src={Image} alt="" />
+                <img src={formatUrlImage(item.thumbnail!)} alt="" />
               </div>
               <h3 className="line-clamp-3">
-                On the 'Noble Failure' of the Pre-Raphaelites, a Group Long Held
-                in 'Generally Low Repute,' in 1964
+                {item.title}
               </h3>
               <div className="text-foreground-gray font-normal line-clamp-3 h-16">
-                No matter the eventual outcome, there was little sign that the
-                negotiators would achive the kind of sweeping deal to battle
-                back warming that would satisfy the demands of youth activists.
+                {item.description}
               </div>
               <div className="text-foreground-gray font-medium">
-                By <span className="text-foreground-red">Tuan </span>
-                and <span className="text-foreground-red">PiKayQi</span>
+                By <span className="text-foreground-red">{item.user.firstName} {item.user.firstName}</span>
+                {/* and <span className="text-foreground-red">PiKayQi</span> */}
               </div>
             </div>
           ))}
@@ -110,7 +120,10 @@ function CategoryNewsPage() {
           ))}
         </div>
         {[...Array(3)].map((_i, index) => (
-          <div key={index} className="col-span-1 flex flex-col gap-4 p-10 border border-foreground-gray">
+          <div
+            key={index}
+            className="col-span-1 flex flex-col gap-4 p-10 border border-foreground-gray"
+          >
             <div className="flex items-center gap-4">
               <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
                 sport
@@ -205,7 +218,10 @@ function CategoryNewsPage() {
           ))}
         </div>
         {[...Array(3)].map((_i, index) => (
-          <div key={index} className="col-span-1 min-h-[700px] h-full flex flex-col justify-between p-10 border border-foreground-gray">
+          <div
+            key={index}
+            className="col-span-1 min-h-[700px] h-full flex flex-col justify-between p-10 border border-foreground-gray"
+          >
             <div className="flex items-center gap-4">
               <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
                 sport
@@ -243,7 +259,10 @@ function CategoryNewsPage() {
           ))}
         </div>
         {[...Array(3)].map((_, index) => (
-          <div key={index} className="col-span-1 min-h-[700px] h-full flex flex-col justify-between p-10 border border-foreground-gray">
+          <div
+            key={index}
+            className="col-span-1 min-h-[700px] h-full flex flex-col justify-between p-10 border border-foreground-gray"
+          >
             <div className="flex items-center gap-4">
               <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
                 sport

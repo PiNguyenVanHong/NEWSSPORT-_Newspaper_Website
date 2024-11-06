@@ -1,9 +1,10 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { articleDetailPageLoader, categoryDashboardPageLoader } from "@/lib/loader";
+import {
+  categoryDashboardPageLoader,
+  wrapperPageLoader,
+} from "@/lib/loader";
 
 import Homepage from "@/routes/homepage/page";
-import CategoryNewsPage from "@/routes/category/page";
-import ArticleDetailPage from "@/routes/article-detail/page";
 import ContactUsPage from "@/routes/contact-us/page";
 import NotFoundPage from "@/routes/not-found/page";
 import SignInPage from "@/routes/sign-in/page";
@@ -19,6 +20,7 @@ import DashboardCreateCategoryPage from "@/routes/dashboard/category/create/page
 import LayoutPage from "@/components/layout/layout";
 import AuthLayoutPage from "@/components/layout/auth-layout";
 import DashboardLayoutPage from "@/components/layout/dashboard-layout";
+import WrapperPage from "./routes/wrapper-page/page";
 
 function App() {
   const router = createBrowserRouter([
@@ -31,17 +33,9 @@ function App() {
           element: <Homepage />,
         },
         {
-          path: "/the-thao",
-          element: <CategoryNewsPage />,
-        },
-        {
-          path: "/sports",
-          element: <CategoryNewsPage />,
-        },
-        {
           path: "/:alias",
-          element: <ArticleDetailPage />,
-          loader: articleDetailPageLoader,
+          element: <WrapperPage />,
+          loader: wrapperPageLoader,
         },
         {
           path: "/contact-us",
@@ -68,21 +62,21 @@ function App() {
         },
         {
           path: "/dashboard/categories/create",
-          element: <DashboardCreateCategoryPage  />
+          element: <DashboardCreateCategoryPage />,
         },
         {
           path: "/dashboard/articles",
-          element: <DashboardArticlePage  />
+          element: <DashboardArticlePage />,
         },
         {
           path: "/dashboard/articles/create",
-          element: <DashboardCreateArticlePage  />
+          element: <DashboardCreateArticlePage />,
         },
         {
           path: "/dashboard/test-table",
-          element: <TestTablePage  />
+          element: <TestTablePage />,
         },
-      ]
+      ],
     },
     {
       path: "/",
@@ -98,8 +92,8 @@ function App() {
         },
         {
           path: "/verify",
-          element: <VerifyPage />
-        }
+          element: <VerifyPage />,
+        },
       ],
     },
   ]);

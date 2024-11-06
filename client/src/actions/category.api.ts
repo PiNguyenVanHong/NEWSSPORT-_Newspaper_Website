@@ -1,4 +1,9 @@
-import { CATEGORY_ROUTES, GET_ALL_CATEGORY, HeaderConfig, requestClient } from "@/actions/api.route";
+import {
+  CATEGORY_ROUTES,
+  GET_ALL_CATEGORY,
+  HeaderConfig,
+  requestClient,
+} from "@/actions/api.route";
 import { getToken } from "@/lib/utils";
 import { CategoryRequest } from "@/types/category.type";
 
@@ -10,14 +15,24 @@ export const getAllCategory = async (query?: string) => {
   return data;
 };
 
+export const getCategoryByAlias = async (alias: string) => {
+  const { data } = await requestClient.get(CATEGORY_ROUTES, {
+    params: {
+      alias: alias.replace("/", ""),
+    },
+  });
+
+  return data;
+};
+
 export const createCategory = async (body: CategoryRequest) => {
   const token = await getToken();
 
   const { data } = await requestClient.post(
-    CATEGORY_ROUTES, 
-    body, 
+    CATEGORY_ROUTES,
+    body,
     HeaderConfig(token, false)
   );
 
   return data;
-}
+};

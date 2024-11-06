@@ -69,8 +69,9 @@ export class ArticlesService {
   async findAll(query: string) {
     const { filter, skip, sort, projection } = aqp(query);
 
-    const articles = await this.articleRepository
+    const createBuilders = this.articleRepository
       .createQueryBuilder('article')
+      .leftJoinAndSelect('article.category', 'category')
       .leftJoinAndSelect('article.user', 'user')
       .select([
         'article.id',
@@ -84,8 +85,27 @@ export class ArticlesService {
         'user.firstName',
         'user.lastName',
         'user.avatar',
-      ])
-      .getMany();
+        'category.id',
+        'category.name',
+      ]);
+
+    if (filter.categoryId) {
+      const articles = await createBuilders
+        .andWhere('category.id = :categoryId', { categoryId: filter.categoryId })
+        .getMany();
+
+      return { results: articles };
+    }
+
+    if (filter.title) {
+      const articles = await createBuilders
+        .where('article.title LIKE :title', { title: `%${filter.title.toString()}%` })
+        .getMany();
+
+      return { results: articles };
+    }
+
+    const articles = await createBuilders.getMany();
 
     return { results: articles };
   }
@@ -110,10 +130,18 @@ export class ArticlesService {
     return isExist;
   }
 
-  async findOne(id: number, query: string) {
+  async findOne(id: number, query?: string, isBasis?: boolean) {
     const { filter, skip, sort, projection } = aqp(query);
 
-    if (query.length >= 0) {
+    if(!isBasis) {
+      const result = await this.articleRepository.findOne({
+        where: { id },
+      });
+
+      return { result };
+    }
+
+    if (Object.keys(query).length !== 0) {
       return { result: null };
     } else {
       const result = await this.articleRepository

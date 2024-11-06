@@ -50,7 +50,7 @@ export class ArticlesController {
 
   @Get()
   @Public()
-  @CacheKey("all_articles")
+  @CacheKey('all_articles')
   @CacheTTL(1)
   findAll(@Query() query: string) {
     return this.articlesService.findAll(query);
@@ -58,13 +58,19 @@ export class ArticlesController {
 
   @Get(':id')
   @Public()
-  findOne(@Param('id') id: string, @Query() query: string) {
-    return this.articlesService.findOne(+id, query);
+  findOne(
+    @Param('id') id: string,
+    @Query() query: string,
+  ) {
+    return this.articlesService.findOne(+id, query, true);
   }
 
   @Get('')
   @Public()
-  findOneByCategoryId(@Query('categoryId') categoryId: string, @Query() query: string) {
+  findOneByCategoryId(
+    @Query('categoryId') categoryId: string,
+    @Query() query: string,
+  ) {
     return this.articlesService.findOneByCategoryId(categoryId);
   }
 

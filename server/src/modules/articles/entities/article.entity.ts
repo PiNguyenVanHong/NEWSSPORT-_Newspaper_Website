@@ -1,10 +1,13 @@
 import { Category } from '@/modules/categories/entities/category.entity';
+import { Favorite } from '@/modules/favorites/entities/favorite.entity';
 import { User } from '@/modules/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -14,6 +17,7 @@ export class Article {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index({ "fulltext": true })
   @Column()
   title: string;
 
@@ -48,6 +52,9 @@ export class Article {
   @Column('datetime')
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Favorite, (favorite) => favorite.article)
+  favorites: Favorite[];
 
   @ManyToOne(() => Category, (category) => category.articles, {
     onDelete: 'CASCADE',
