@@ -3,15 +3,18 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateArticleDto } from './dto/create-article.dto';
-import { UpdateArticleDto } from './dto/update-article.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Article } from './entities/article.entity';
-import { Repository } from 'typeorm';
-import { CategoriesService } from '../categories/categories.service';
-import { UsersService } from '../users/users.service';
-import { UpdateArticleThumbnail } from './dto/update-article-thumbnail.dto';
 import aqp from 'api-query-params';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import { UsersService } from '@/modules/users/users.service';
+import { CategoriesService } from '@/modules/categories/categories.service';
+import { Article } from '@/modules/articles/entities/article.entity';
+import { ArticleStatus } from '@/modules/articles/entities/article.enum';
+import { CreateArticleDto } from '@/modules/articles/dto/create-article.dto';
+import { UpdateArticleDto } from '@/modules/articles/dto/update-article.dto';
+import { UpdateArticleThumbnail } from '@/modules/articles/dto/update-article-thumbnail.dto';
+import { take } from 'rxjs';
 
 @Injectable()
 export class ArticlesService {
@@ -66,10 +69,26 @@ export class ArticlesService {
     return { message: 'Create article successfully' };
   }
 
-  async findAll(query: string) {
-    const { filter, skip, sort, projection } = aqp(query);
+  async findAll(
+    query: string,
+    current: number,
+    pageSize: number,
+    userRole?: string,
+  ) {
+    const { filter, sort, projection } = aqp(query);
 
-    const createBuilders = this.articleRepository
+    if (filter.current) delete filter.current;
+    if (filter.pageSize) delete filter.pageSize;
+
+    if (!current) current = 1;
+    if (!pageSize) pageSize = 10;
+
+    let totalItems = (await this.articleRepository.find(filter)).length;
+    let totalPages = Math.ceil(totalItems / pageSize);
+
+    const skip = (current - 1) * pageSize;
+
+    const queryBulider = this.articleRepository
       .createQueryBuilder('article')
       .leftJoinAndSelect('article.category', 'category')
       .leftJoinAndSelect('article.user', 'user')
@@ -87,27 +106,59 @@ export class ArticlesService {
         'user.avatar',
         'category.id',
         'category.name',
-      ]);
+      ])
+      .orderBy('article.createdAt', 'DESC')
+      .skip(skip)
+      .take(pageSize);
+
+    if (!userRole || userRole === 'USER') {
+      queryBulider
+        .where('article.status = :status', { status: ArticleStatus.APPROVED })
+        .andWhere('article.isDeleted = :isDeleted', { isDeleted: false });
+    }
 
     if (filter.categoryId) {
-      const articles = await createBuilders
-        .andWhere('category.id = :categoryId', { categoryId: filter.categoryId })
+      const articles = await queryBulider
+        .andWhere('category.id = :categoryId', {
+          categoryId: filter.categoryId,
+        })
         .getMany();
 
       return { results: articles };
     }
 
     if (filter.title) {
-      const articles = await createBuilders
-        .where('article.title LIKE :title', { title: `%${filter.title.toString()}%` })
-        .getMany();
+      
+      const [articles, total]= await queryBulider
+      .andWhere('article.title LIKE :title', {
+        title: `%${filter.title.toString()}%`,
+      })
+      .getManyAndCount();
+      
+      let totalPages = Math.ceil(total / pageSize);
 
-      return { results: articles };
+      return {
+        meta: {
+          current,
+          pageSize,
+          pages: totalPages,
+          total: total,
+        },
+        results: articles,
+      };
     }
 
-    const articles = await createBuilders.getMany();
+    const articles = await queryBulider.getMany();
 
-    return { results: articles };
+    return {
+      meta: {
+        current,
+        pageSize,
+        pages: totalPages,
+        total: totalItems,
+      },
+      results: articles,
+    };
   }
 
   async findAllOne(id: number) {
@@ -133,7 +184,7 @@ export class ArticlesService {
   async findOne(id: number, query?: string, isBasis?: boolean) {
     const { filter, skip, sort, projection } = aqp(query);
 
-    if(!isBasis) {
+    if (!isBasis) {
       const result = await this.articleRepository.findOne({
         where: { id },
       });

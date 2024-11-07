@@ -558,7 +558,7 @@ function Homepage({}: HomepageProps) {
               <div className="text-foreground-gray font-medium capitalize">
                 By{" "}
                 <span className="text-foreground-red">
-                  {item.user.firstName} {item.user.lastName}
+                  {item?.user?.firstName} {item?.user?.lastName}
                 </span>
               </div>
             </div>

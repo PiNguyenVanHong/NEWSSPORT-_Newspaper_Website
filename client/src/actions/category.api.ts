@@ -7,10 +7,10 @@ import {
 import { getToken } from "@/lib/utils";
 import { CategoryRequest } from "@/types/category.type";
 
-export const getAllCategory = async (query?: string) => {
+export const getAllCategory = async (query?: string, current?: string, pageSize?: string) => {
   if (!query) query = "";
 
-  const { data } = await requestClient.get(GET_ALL_CATEGORY + query);
+  const { data } = await requestClient.get(GET_ALL_CATEGORY + query + `&current=${current}&pageSize=${pageSize}`);
 
   return data;
 };

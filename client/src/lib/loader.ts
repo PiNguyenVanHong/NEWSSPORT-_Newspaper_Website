@@ -1,3 +1,5 @@
+import queryString from "query-string";
+import { redirect } from "react-router-dom";
 import { buildQueryString, getIdFromSlug } from "@/lib/utils";
 import { getAllCategory, getCategoryByAlias } from "@/actions/category.api";
 import {
@@ -5,7 +7,7 @@ import {
   getAllArticleByCategoryId,
   getArticleById,
 } from "@/actions/article.api";
-import { redirect } from "react-router-dom";
+import { getFavoritesByUserId } from "@/actions/favorite.api";
 
 export const homepageLoader = async () => {
   try {
@@ -70,6 +72,24 @@ export const articleDetailLoader = async ({ params }: any) => {
     return null;
   }
 };
+
+export const favoritesPageLoader = async () => {
+  try {
+    const { results } = await getFavoritesByUserId();
+
+    return { results };
+  } catch (error) {
+    console.log(error);
+    return redirect("/404");
+  }
+};
+
+export const searchPageLoader = async ({ request }: { request: Request }) => {
+  const { q } = queryString.parse(new URL(request.url).search);
+  // const results = await fetch(`/api/search?query=${query}`);
+  // return results.json();
+  return q;
+}
 
 export const categoryDashboardPageLoader = async () => {
   try {

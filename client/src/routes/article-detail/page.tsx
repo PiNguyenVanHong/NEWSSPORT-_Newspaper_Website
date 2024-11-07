@@ -12,6 +12,10 @@ import {
 import BreadcrumbCustom from "@/components/breadcumb-custom";
 import { ArticleResponse } from "@/types/article.type";
 import ContentArticle from "@/components/article/content";
+import { Bookmark, BookmarkCheck } from "lucide-react";
+import { addFavorite, checkFavoriteByArticleId, removeFavorite } from "@/actions/favorite.api";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 const socials = [
   { id: 1, name: "Facebook", link: "/" },
@@ -40,7 +44,7 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [data, setData] = useState(article);
+  const [isFavorite, setIsFavorite] = useState(false);
   const divRef = useRef<HTMLDivElement>(null);
 
   const breadcrumbs = [
@@ -50,6 +54,16 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
     { label: "Sports", link: "/" },
     { label: article.title },
   ];
+
+  useEffect(() => {
+    const checkFavorite = async () => {
+      const { result } = await checkFavoriteByArticleId(article.id!);
+
+      setIsFavorite(result);
+    };
+
+    checkFavorite();
+  }, []); 
 
   useEffect(() => {
     if (!alias.includes(".html")) navigate("/404");
@@ -64,6 +78,40 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
     divRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [alias, article]);
 
+  const handleFavorite = () => {
+    if(isFavorite) {
+      toast.promise(removeFavorite(article.id!), {
+        loading: "Loading...",
+        success: ({ message }: { message: string }) => {
+          setIsFavorite(false);
+          return message;
+        },
+        error: (error) => {
+          if (error instanceof AxiosError) return error?.response?.data?.message;
+          else {
+            console.log(error);
+            return "Something went wrong!!!";
+          }
+        },
+      });
+    } else {
+      toast.promise(addFavorite(article.id!), {
+        loading: "Loading...",
+        success: ({ message }: { message: string }) => {
+          setIsFavorite(true);
+          return message;
+        },
+        error: (error) => {
+          if (error instanceof AxiosError) return error?.response?.data?.message;
+          else {
+            console.log(error);
+            return "Something went wrong!!!";
+          }
+        },
+      });
+    }
+  };
+
   return (
     <div ref={divRef} className="w-full max-w-7xl mx-auto">
       <div className="mb-10 mt-6">
@@ -77,14 +125,27 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
         </div>
         <div className="col-span-2 flex flex-col justify-between">
           <div className="flex flex-col items-start gap-8 p-10 border border-foreground-gray flex-1">
-            <div className="flex items-center gap-4">
-              <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
-                sport
+            <div className="w-full flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
+                  sport
+                </div>
+                <div className="text-foreground-gray font-medium uppercase">
+                  {formatDateBasis(new Date(article.createdAt!), FORMAT_DATE)}
+                  {/* {formatDateInTimeZone(article.createdAt!, FORMAT_DATE)} */}
+                </div>
               </div>
-              <div className="text-foreground-gray font-medium uppercase">
-                {formatDateBasis(new Date(article.createdAt!), FORMAT_DATE)}
-                {/* {formatDateInTimeZone(article.createdAt!, FORMAT_DATE)} */}
-              </div>
+
+              <button
+                className="rounded-full p-2 border border-slate-300 hover:opacity-70 transition duration-300"
+                onClick={handleFavorite}
+              >
+                {isFavorite ? (
+                  <BookmarkCheck className="text-emerald-500" size={20} />
+                ) : (
+                  <Bookmark size={20} />
+                )}
+              </button>
             </div>
             <h2 className="text-3xl">{article.title}</h2>
             {/* <div className="w-full h-96">
@@ -111,7 +172,7 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
               <div className="flex flex-col gap-2 items-start">
                 <div className="text-foreground-gray font-medium">Author</div>
                 <div className="font-semibold capitalize">
-                  {article.user.firstName} {article.user.lastName}
+                  {article?.user?.firstName} {article?.user?.lastName}
                 </div>
               </div>
             </div>

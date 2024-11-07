@@ -1,6 +1,7 @@
 import { Category } from '@/modules/categories/entities/category.entity';
 import { Favorite } from '@/modules/favorites/entities/favorite.entity';
 import { User } from '@/modules/users/entities/user.entity';
+import { ArticleStatus } from '@/modules/articles/entities/article.enum';
 import {
   Column,
   CreateDateColumn,
@@ -36,7 +37,11 @@ export class Article {
   @Column('timestamp', { nullable: true })
   pubDate: Date;
 
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: ArticleStatus,
+    default: ArticleStatus.PENDING
+  })
   status: string;
 
   @Column({ default: false })

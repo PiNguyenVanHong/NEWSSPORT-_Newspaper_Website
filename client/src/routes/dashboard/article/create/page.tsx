@@ -55,8 +55,8 @@ function DashboardCreateArticlePage() {
 
   useEffect(() => {
     const getCategories = async () => {
-      const categories = await getAllCategory();
-      setCategories(categories);
+      const { results } = await getAllCategory();
+      setCategories(results);
     };
 
     getCategories();

@@ -8,6 +8,7 @@ import {
   Delete,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { Request as ReqExpress } from 'express';
 import { FavoritesService } from '@/modules/favorites/favorites.service';
@@ -27,6 +28,19 @@ export class FavoritesController {
   @Get()
   findAll(@Req() req: any) {
     return this.favoritesService.findAll(req.user.userId);
+  }
+
+  @Get('me')
+  findAllByUserId(@Req() req: any) {
+    return this.favoritesService.findAllByUserId(req.user.userId);
+  }
+
+  @Get('check')
+  isFavorite(
+    @Query() { articleId }: { articleId: string },
+    @Req() req: any
+  ) {
+    return this.favoritesService.isFavorite(req.user.userId, +articleId);
   }
 
   @Get(':id')

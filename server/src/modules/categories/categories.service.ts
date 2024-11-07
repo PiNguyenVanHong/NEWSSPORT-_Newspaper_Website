@@ -29,20 +29,40 @@ export class CategoriesService {
     return { message: 'Create category sucessfully!!!' };
   }
 
-  async findAll(query: string) {
-    const { filter, skip, sort, projection } = aqp(query);
+  async findAll(query: string, current: number, pageSize: number) {
+    const { filter, sort, projection } = aqp(query);
 
-    if (Object.keys(query).length > 0) {
+    if (filter.current) delete filter.current;
+    if (filter.pageSize) delete filter.pageSize;
+
+    if (!current) current = 1;
+    if (!pageSize) pageSize = 10;
+
+    let totalItems = (await this.categoryRepository.find(filter)).length;
+    let totalPages = Math.ceil(totalItems / pageSize);
+
+    const skip = (current - 1) * pageSize;
+
+    if (Object.keys(filter).length > 0 || projection || sort) {
       const categories = await this.categoryRepository.find({
         select: projection,
         skip,
+        take: pageSize,
         where: filter,
         order: sort,
       });
 
-      return { results: categories };
+      return {
+        meta: {
+          current,
+          pageSize,
+          pages: totalPages,
+          total: totalItems,
+        },
+        results: categories,
+      };
     } else {
-      const categories = await this.categoryRepository
+      const [categories, total] = await this.categoryRepository
         .createQueryBuilder('category')
         .leftJoinAndSelect('category.articles', 'article')
         .select([
@@ -56,10 +76,20 @@ export class CategoriesService {
           'article.id',
           'article.title',
         ])
-        .limit(50)
-        .getMany();
+        .orderBy('category.level', 'ASC')
+        .getManyAndCount();
 
-      return { results: categories };
+      let totalPages = Math.ceil(total / pageSize);
+
+      return {
+        meta: {
+          current,
+          pageSize,
+          pages: totalPages,
+          total: total,
+        },
+        results: categories,
+      };
     }
   }
 

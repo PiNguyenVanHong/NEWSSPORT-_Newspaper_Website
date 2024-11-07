@@ -28,8 +28,12 @@ export class CategoriesController {
 
   @Get()
   @Public()
-  findAll(@Query() query: string) {
-    return this.categoriesService.findAll(query);
+  findAll(
+    @Query() query: string,
+    @Query('current') current: string,
+    @Query('pageSize') pageSize: string,
+  ) {
+    return this.categoriesService.findAll(query, +current, +pageSize);
   }
 
   @Get(':id')

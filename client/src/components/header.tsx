@@ -118,6 +118,12 @@ const Header = () => {
     }
   };
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const value = (e.target as HTMLInputElement).value;
+    navigate(`/search?q=${encodeURIComponent(value)}`);
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto my-4">
       <div className="flex items-center justify-between text-foreground-gray uppercase font-medium text-sm">
@@ -151,6 +157,7 @@ const Header = () => {
               name="search"
               className="block py-1 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-foreground-red focus:outline-none focus:ring-0 focus:border-foreground-red peer"
               placeholder="what are you looking for?"
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch(e)}
               required
             />
           </div>
@@ -174,9 +181,14 @@ const Header = () => {
                   <DropdownMenuContent>
                     <DropdownMenuSeparator />
                     {role === "ADMIN" && (
-                      <DropdownMenuItem>
-                        <Link to={"/dashboard"}>Dashboard</Link>
-                      </DropdownMenuItem>
+                      <>
+                        <DropdownMenuItem>
+                          <Link to={"/dashboard"}>Dashboard</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <TransitionLink href={"/favorites"} label="Favorites" />
+                        </DropdownMenuItem>
+                      </>
                     )}
                     <DropdownMenuItem>Profile</DropdownMenuItem>
                     <DropdownMenuItem>Billing</DropdownMenuItem>

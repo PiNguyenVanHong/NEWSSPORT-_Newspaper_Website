@@ -33,6 +33,14 @@ export class FavoritesService {
     return existingFavorite;
   }
 
+  async isFavorite(userId: string, articleId: number) {
+    const isExist = await this.favoriteRepository.exists({
+      where: { user: { id: userId }, article: { id: articleId } },
+    });;
+
+    return { result: isExist };
+  }
+
   async create(createFavoriteDto: CreateFavoriteDto) {
     const { userId, articleId } = createFavoriteDto;
 
@@ -58,11 +66,55 @@ export class FavoritesService {
   }
 
   async findAll(userId: string) {
-    if(userId) {
-      const favorites = await this.favoriteRepository.find({
-        where: { user: { id: userId } },
-        relations: ['article'],
-      });
+    if(userId !== "") {
+      const favorites = await this.favoriteRepository
+        .createQueryBuilder('favorite')
+        .leftJoinAndSelect('favorite.article', 'article')
+        .leftJoinAndSelect('article.user', 'user')
+        .leftJoinAndSelect('favorite.user', 'favUser')
+        .where('favUser.id  = :userId', { userId })
+        .select([
+          'favorite.id',
+          'favorite.id',
+          'article.id',
+          'article.title',
+          'article.description',
+          'article.thumbnail',
+          'article.createdAt',
+          'article.isDeleted',
+          'user.id',
+          'user.lastName',
+          'user.firstName',
+        ])
+        .getMany();
+
+      return { results: favorites}
+    }
+    return null;
+  }
+
+  async findAllByUserId(userId: string) {
+    if(userId !== "") {
+      const favorites = await this.favoriteRepository
+        .createQueryBuilder('favorite')
+        .leftJoinAndSelect('favorite.article', 'article')
+        .leftJoinAndSelect('article.user', 'user')
+        .leftJoinAndSelect('favorite.user', 'favUser')
+        .where('favUser.id  = :userId', { userId })
+        .select([
+          'favorite.id',
+          'favorite.id',
+          'article.id',
+          'article.title',
+          'article.description',
+          'article.thumbnail',
+          'article.createdAt',
+          'article.isDeleted',
+          'user.id',
+          'user.lastName',
+          'user.firstName',
+        ])
+        .getMany();
 
       return { results: favorites}
     }

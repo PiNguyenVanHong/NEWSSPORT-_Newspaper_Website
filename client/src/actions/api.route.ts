@@ -6,6 +6,7 @@ const AUTH_ROUTES = `${HOST}/api/auth`;
 // const USER_ROUTES = `${HOST}/api/users`;
 export const CATEGORY_ROUTES = `${HOST}/api/categories`;
 export const ARTICLE_ROUTES = `${HOST}/api/articles`;
+export const FAVORITE_ROUTES = `${HOST}/api/favorites`;
 
 export const LOGIN_ROUTE = `${AUTH_ROUTES}/login`;
 export const REGISTER_ROUTE = `${AUTH_ROUTES}/register`;
@@ -22,7 +23,7 @@ export const requestClient = axios.create({
   withCredentials: true,
 });
 
-export const HeaderConfig = (token: string, isFile: boolean) => {
+export const HeaderConfig = (token: string, isFile?: boolean) => {
   if (isFile) {
     return {
       headers: {

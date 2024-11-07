@@ -52,8 +52,12 @@ export class ArticlesController {
   @Public()
   @CacheKey('all_articles')
   @CacheTTL(1)
-  findAll(@Query() query: string) {
-    return this.articlesService.findAll(query);
+  findAll(
+    @Query() query: string, 
+    @Query("current") current: string,
+    @Query("pageSize") pageSize: string,
+    @Req() req: any) {
+    return this.articlesService.findAll(query, +current, +pageSize, req?.user?.role);
   }
 
   @Get(':id')

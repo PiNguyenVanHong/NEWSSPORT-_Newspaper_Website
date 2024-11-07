@@ -1,6 +1,8 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import {
   categoryDashboardPageLoader,
+  favoritesPageLoader,
+  searchPageLoader,
   wrapperPageLoader,
 } from "@/lib/loader";
 
@@ -12,6 +14,9 @@ import SignUpPage from "@/routes/sign-up/page";
 import VerifyPage from "@/routes/verify/page";
 import DashboardPage from "@/routes/dashboard/page";
 import TestTablePage from "@/routes/test-table/page";
+import WrapperPage from "@/routes/wrapper-page/page";
+import FavoritesPage from "@/routes/favorites/page";
+import SearchPage from "@/routes/search/page";
 import DashboardCategoryPage from "@/routes/dashboard/category/page";
 import DashboardArticlePage from "@/routes/dashboard/article/page";
 import DashboardCreateArticlePage from "@/routes/dashboard/article/create/page";
@@ -20,7 +25,6 @@ import DashboardCreateCategoryPage from "@/routes/dashboard/category/create/page
 import LayoutPage from "@/components/layout/layout";
 import AuthLayoutPage from "@/components/layout/auth-layout";
 import DashboardLayoutPage from "@/components/layout/dashboard-layout";
-import WrapperPage from "./routes/wrapper-page/page";
 
 function App() {
   const router = createBrowserRouter([
@@ -38,8 +42,18 @@ function App() {
           loader: wrapperPageLoader,
         },
         {
+          path: "/favorites",
+          element: <FavoritesPage />,
+          loader: favoritesPageLoader,
+        },
+        {
           path: "/contact-us",
           element: <ContactUsPage />,
+        },
+        {
+          path: "/search",
+          element: <SearchPage />,
+          loader: searchPageLoader,
         },
         {
           path: "/404",

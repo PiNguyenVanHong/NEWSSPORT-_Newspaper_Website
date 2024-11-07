@@ -16,5 +16,5 @@ export type ArticleResponse = {
   thumbnail?: string;
   content?: string;
   createdAt?: Date;
-  user: UserResponse;
+  user?: UserResponse;
 };
