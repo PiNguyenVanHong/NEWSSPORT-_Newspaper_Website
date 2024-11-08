@@ -56,3 +56,24 @@ export const formArticleSchema = z.object({
       ".jpg, .jpeg, .png and .webp files are accepted."
     ),
 });
+
+export const formUpdateArticleSchema = z.object({
+  title: z.string().min(2, "Please fill the title"),
+  description: z.string().optional(),
+  content: z.string().optional(),
+  categoryId: z.string().min(2, "Please choose a category"),
+  status: z.string().min(2, "Please choose a status"),
+  oldThumbnail: z.string().optional(),
+  thumbnail: z
+    .any()
+    .optional()
+    .refine((files) => files?.length == 1, "Image is required.")
+    .refine(
+      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
+      `Max file size is 5MB.`
+    )
+    .refine(
+      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
+      ".jpg, .jpeg, .png and .webp files are accepted."
+    ),
+});

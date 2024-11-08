@@ -121,6 +121,8 @@ const Header = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const value = (e.target as HTMLInputElement).value;
+    (e.target as HTMLInputElement).value = "";
+    
     navigate(`/search?q=${encodeURIComponent(value)}`);
   };
 

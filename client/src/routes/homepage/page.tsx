@@ -109,53 +109,55 @@ function Homepage({}: HomepageProps) {
 
   const onClick = (title: string, id: string) => {
     navigate(generateSlug(title, id));
-  }
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto">
       <div className="grid grid-cols-4 gap-8 items-stretch my-6">
-        <div className="col-span-1">
-          {[...hero1].slice(3, 6).map((item, index) => (
-            <div
-              key={item.article_id}
-              className={cn(
-                "flex flex-col gap-4 py-4",
-                index != 0 && "border-t-2 border-gray-300"
-              )}
-              onClick={() => handleClick(item.link)}
-            >
-              <h2>{item.title}</h2>
-              <div className="line-clamp-5 text-foreground-gray font-normal">
-                {item.description}
-              </div>
-              <div className="flex flex-col gap-0.5 text-foreground-gray font-medium">
-                {item.creator && item?.creator.length > 1 ? (
-                  <div className="flex gap-1.5 items-center">
-                    By
-                    {item.creator.map((au, index) => {
-                      return (
-                        <>
-                          {index != 0 && <span>and</span>}
-                          <span className="text-foreground-red">{au}</span>
-                        </>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div>
-                    By{" "}
-                    <span className="text-foreground-red">
-                      {item.creator && item.creator[0]}
-                    </span>
-                  </div>
+        <div className="col-span-1 flex flex-col items-start justify-between">
+          <div className="w-full">
+            {[...hero1].slice(3, 6).map((item, index) => (
+              <div
+                key={item.article_id}
+                className={cn(
+                  "flex flex-col gap-4 py-4",
+                  index != 0 && "border-t-2 border-gray-300"
                 )}
-                <div className="text-foreground-gray font-medium">
-                  {formatDatePublish(new Date(item.pubDate))}
+                onClick={() => handleClick(item.link)}
+              >
+                <h2>{item.title}</h2>
+                <div className="line-clamp-5 text-foreground-gray font-normal">
+                  {item.description}
+                </div>
+                <div className="flex flex-col gap-0.5 text-foreground-gray font-medium">
+                  {item.creator && item?.creator.length > 1 ? (
+                    <div className="flex gap-1.5 items-center">
+                      By
+                      {item.creator.map((au, index) => {
+                        return (
+                          <>
+                            {index != 0 && <span>and</span>}
+                            <span className="text-foreground-red">{au}</span>
+                          </>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div>
+                      By{" "}
+                      <span className="text-foreground-red">
+                        {item.creator && item.creator[0]}
+                      </span>
+                    </div>
+                  )}
+                  <div className="text-foreground-gray font-medium">
+                    {formatDatePublish(new Date(item.pubDate))}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-          <div className="border-2 border-gray-300 p-4">
+            ))}
+          </div>
+          <div className="w-full border-2 border-gray-300 p-4">
             <div className="flex items-start justify-between">
               <h4 className="font-playfair text-2xl font-bold">
                 Subscribe <br /> Our Newsletter
@@ -539,7 +541,11 @@ function Homepage({}: HomepageProps) {
               onClick={() => onClick(item.title!, item.id!)}
             >
               <div className="h-56 overflow-hidden">
-                <img className="group-hover:scale-110 transition duration-300" src={formatUrlImage(item.thumbnail!)} alt="" />
+                <img
+                  className="group-hover:scale-110 transition duration-300"
+                  src={formatUrlImage(item.thumbnail!)}
+                  alt=""
+                />
               </div>
               <div className="flex justify-between items-center">
                 <div className="text-foreground-gray font-medium">

@@ -83,6 +83,15 @@ export class ArticlesController {
     return this.articlesService.update(+id, updateArticleDto);
   }
 
+  @Patch(':id/status')
+  @Roles(Role.ADMIN)
+  updateStatus(
+    @Param('id') id: string,
+    @Body() { status }: { status: string }
+  ) {
+    return this.articlesService.updateStatus(+id, status);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.articlesService.remove(+id);

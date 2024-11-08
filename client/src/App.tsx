@@ -1,8 +1,10 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import {
+  articleDashboarPageLoader,
   categoryDashboardPageLoader,
   favoritesPageLoader,
   searchPageLoader,
+  updateArticleDashboardPageLoader,
   wrapperPageLoader,
 } from "@/lib/loader";
 
@@ -18,9 +20,10 @@ import WrapperPage from "@/routes/wrapper-page/page";
 import FavoritesPage from "@/routes/favorites/page";
 import SearchPage from "@/routes/search/page";
 import DashboardCategoryPage from "@/routes/dashboard/category/page";
+import DashboardCreateCategoryPage from "@/routes/dashboard/category/create/page";
 import DashboardArticlePage from "@/routes/dashboard/article/page";
 import DashboardCreateArticlePage from "@/routes/dashboard/article/create/page";
-import DashboardCreateCategoryPage from "@/routes/dashboard/category/create/page";
+import DashboardUpdateArticlePage from "@/routes/dashboard/article/update/page";
 
 import LayoutPage from "@/components/layout/layout";
 import AuthLayoutPage from "@/components/layout/auth-layout";
@@ -81,6 +84,12 @@ function App() {
         {
           path: "/dashboard/articles",
           element: <DashboardArticlePage />,
+          loader: articleDashboarPageLoader,
+        },
+        {
+          path: "/dashboard/articles/:id",
+          element: <DashboardUpdateArticlePage />,
+          loader: updateArticleDashboardPageLoader,
         },
         {
           path: "/dashboard/articles/create",

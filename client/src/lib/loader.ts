@@ -32,9 +32,9 @@ export const wrapperPageLoader = async ({ params }: any) => {
       if (!result.category) throw new Error("Not Found");
       return result;
     }
-  } catch(error) {
+  } catch (error) {
     console.log(error);
-    
+
     return redirect("/404");
   }
 };
@@ -85,11 +85,22 @@ export const favoritesPageLoader = async () => {
 };
 
 export const searchPageLoader = async ({ request }: { request: Request }) => {
-  const { q } = queryString.parse(new URL(request.url).search);
-  // const results = await fetch(`/api/search?query=${query}`);
-  // return results.json();
-  return q;
-}
+  try {
+    const { q } = queryString.parse(new URL(request.url).search);
+    const query = buildQueryString({
+      filter: {
+        title: q?.toString() || "",
+      },
+    });
+
+    const { meta, results } = await getAllArticle(query);
+
+    return { q, meta, results };
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
 
 export const categoryDashboardPageLoader = async () => {
   try {
@@ -116,3 +127,33 @@ export const categoryDashboardPageLoader = async () => {
     return null;
   }
 };
+
+export const articleDashboarPageLoader = async ({ request }: { request: Request }) => {
+  try {
+    const { current, pageSize } = queryString.parse(new URL(request.url).search);
+
+    const { meta, results } = await getAllArticle(`?current=${current}&pageSize=${pageSize}`);
+
+    return { meta, results };
+  } catch (error) {
+    console.log(error);
+    return { meta: null, results: [] };
+  }
+};
+
+export const updateArticleDashboardPageLoader = async ({ params }: any) => {
+  try {
+    const { id } = params;
+    
+    const { result } = await getArticleById(id);
+    const { results } = await getAllCategory();
+
+    return { 
+      article: result,
+      categories: results,
+    };
+  } catch (error) {
+    console.log(error);
+    return { result: null, categories: [] };
+  }
+}

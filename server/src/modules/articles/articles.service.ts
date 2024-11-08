@@ -99,6 +99,7 @@ export class ArticlesService {
         'article.link',
         'article.content',
         'article.thumbnail',
+        'article.status',
         'article.pubDate',
         'article.createdAt',
         'user.firstName',
@@ -198,18 +199,22 @@ export class ArticlesService {
       const result = await this.articleRepository
         .createQueryBuilder('article')
         .leftJoinAndSelect('article.user', 'user')
+        .leftJoinAndSelect('article.category', 'category')
         .select([
           'article.id',
           'article.title',
           'article.description',
           'article.link',
           'article.content',
+          'article.status',
           'article.thumbnail',
           'article.pubDate',
           'article.createdAt',
           'user.firstName',
           'user.lastName',
           'user.avatar',
+          'category.id',
+          'category.name',
         ])
         .where('article.id = :id', { id })
         .getOne();
@@ -243,6 +248,15 @@ export class ArticlesService {
 
   update(id: number, updateArticleDto: UpdateArticleDto) {
     return `This action updates a #${id} article`;
+  }
+
+  async updateStatus(id: number, status: string) {
+    if(!status) {
+      throw new BadRequestException("Please choose a status");
+    }
+    
+    await this.articleRepository.update(id, { status });
+    return { message: "Article Update Successfully" };
   }
 
   remove(id: number) {

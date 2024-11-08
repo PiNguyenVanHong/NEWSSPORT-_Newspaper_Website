@@ -685,3 +685,17 @@ export const getArticleById = async (id: string) => {
 
   return data;
 };
+
+export const updateStatusArticleById = async (id: string, status: string) => {
+  const token = await getToken();
+
+  const { data } = await requestClient.patch(
+    ARTICLE_ROUTES + "/" + id,
+    {
+      status
+    },
+    HeaderConfig(token, false),
+  );
+
+  return data;
+};

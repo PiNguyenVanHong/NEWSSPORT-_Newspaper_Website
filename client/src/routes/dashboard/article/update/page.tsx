@@ -1,9 +1,17 @@
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { z } from "zod";
-import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useLoaderData } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formArticleSchema } from "@/types/chema.type";
+import { formUpdateArticleSchema } from "@/types/chema.type";
+import { CategoryResponse } from "@/types/category.type";
+import { ArticleRequest } from "@/types/article.type";
+import { ArticleResponse } from "@/types/article.type";
+import { formatUrlImage } from "@/lib/format";
+import { createArticle } from "@/actions/article.api";
 
 import {
   Sidebar,
@@ -33,53 +41,46 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import HeaderAction from "@/components/dashboard/header-action";
-import { getAllCategory } from "@/actions/category.api";
-import { CategoryResponse } from "@/types/category.type";
-import { toast } from "sonner";
-import { createArticle } from "@/actions/article.api";
-import { ArticleRequest } from "@/types/article.type";
-import { AxiosError } from "axios";
 import ContentArticle from "@/components/article/content";
+import { statuses } from "../_components/data";
 
-function DashboardCreateArticlePage() {
+function DashboardUpdateArticlePage() {
+  const {
+    article,
+    categories,
+  }: { article: ArticleResponse; categories: CategoryResponse[] } =
+    useLoaderData() as any;
+
   const breadcrumbs = [
     { label: "Pages", link: "/" },
     { label: "Article", link: "/dashboard/articles" },
-    { label: "Create" },
+    { label: article.title },
   ];
 
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState<boolean>(true);
-  const [content, setContent] = useState("");
-  const [categories, setCategories] = useState<CategoryResponse[]>([]);
-
-  useEffect(() => {
-    const getCategories = async () => {
-      const { results } = await getAllCategory();
-      setCategories(results);
-    };
-
-    getCategories();
-  }, []);
-
-  const onChange = (data: string) => {
-    setContent(data);
-  };
+  const [content, setContent] = useState(article.content!);
 
   const form = useForm({
-    resolver: zodResolver(formArticleSchema),
+    resolver: zodResolver(formUpdateArticleSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      content: "",
+      title: article.title!,
+      description: article.description!,
+      content: article.content!,
+      oldThumbnail: article.thumbnail!,
       thumbnail: undefined,
-      categoryId: "",
+      categoryId: article.category?.id!,
+      status: article.status!,
     },
   });
 
   const fileRef = form.register("thumbnail");
 
-  const onSubmit = async (values: z.infer<typeof formArticleSchema>) => {
+  const onChange = (data: string) => {
+    setContent(data);
+  };
+
+  const onSubmit = async (values: z.infer<typeof formUpdateArticleSchema>) => {
     try {
       setIsLoading(true);
       if (content.trim().length <= 0) {
@@ -87,20 +88,22 @@ function DashboardCreateArticlePage() {
         return;
       }
 
-      const body: ArticleRequest = {
-        title: values.title,
-        content: content,
-        description: values.description,
-        link: "",
-        categoryId: values.categoryId,
-      };
-      const formData = new FormData();
-      formData.append("thumbnail", values.thumbnail[0]);
+      console.log(values);
 
-      const { message } = await createArticle(body, formData);
-      handleClose();
+    //   const body: ArticleRequest = {
+    //     title: values.title,
+    //     content: content,
+    //     description: values.description,
+    //     link: "",
+    //     categoryId: values.categoryId,
+    //   };
+    //   const formData = new FormData();
+    //   formData.append("thumbnail", values.thumbnail[0]);
 
-      toast.success(message);
+    //   const { message } = await createArticle(body, formData);
+    //   handleClose();
+
+    //   toast.success(message);
     } catch (error) {
       if (error instanceof AxiosError)
         toast.error(error?.response?.data?.message);
@@ -225,22 +228,36 @@ function DashboardCreateArticlePage() {
                   </SidebarGroupContent>
                 </SidebarGroup>
                 <SidebarGroup>
-                  <SidebarGroupLabel>Thumbnail</SidebarGroupLabel>
+                  <SidebarGroupLabel>Status</SidebarGroupLabel>
                   <SidebarGroupContent>
                     <SidebarMenu>
                       <SidebarMenuItem>
                         <FormField
                           control={form.control}
-                          name="thumbnail"
-                          render={() => (
+                          name="status"
+                          render={({ field }) => (
                             <FormItem>
-                              <FormControl>
-                                <Input
-                                  {...fileRef}
-                                  type="file"
-                                  placeholder="thumbnail articles...."
-                                />
-                              </FormControl>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger className="bg-white capitalize">
+                                    <SelectValue placeholder="Select a status" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {statuses.map((item, index) => (
+                                    <SelectItem
+                                      key={item.label || index}
+                                      className="capitalize"
+                                      value={item.value.toUpperCase()!}
+                                    >
+                                      {item.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -249,9 +266,40 @@ function DashboardCreateArticlePage() {
                     </SidebarMenu>
                   </SidebarGroupContent>
                 </SidebarGroup>
+                <SidebarGroup>
+                  <SidebarGroupLabel>Thumbnail</SidebarGroupLabel>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      <SidebarMenuItem>
+                        {/* {form.getValues("thumbnail") ? ( */}
+                            <div className="h-48">
+                                <img src={formatUrlImage(form.getValues('oldThumbnail'))} alt="" />
+                            </div>
+                        {/* ): ( */}
+                            <FormField
+                              control={form.control}
+                              name="thumbnail"
+                              render={() => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input
+                                      {...fileRef}
+                                      type="file"
+                                      placeholder="thumbnail articles...."
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                        {/* )} */}
+                      </SidebarMenuItem>
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
 
                 <Button className="w-full" disabled={isLoading}>
-                  Create
+                  Update
                 </Button>
               </form>
             </Form>
@@ -272,7 +320,7 @@ function DashboardCreateArticlePage() {
               <div className="flex flex-1 flex-col gap-4 px-4 py-4">
                 <ContentArticle
                   onChange={onChange}
-                  initialContent={undefined}
+                  initialContent={content}
                   className="bg-white"
                 />
               </div>
@@ -284,4 +332,4 @@ function DashboardCreateArticlePage() {
   );
 }
 
-export default DashboardCreateArticlePage;
+export default DashboardUpdateArticlePage;
