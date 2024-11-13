@@ -122,7 +122,7 @@ const Header = () => {
     e.preventDefault();
     const value = (e.target as HTMLInputElement).value;
     (e.target as HTMLInputElement).value = "";
-    
+
     navigate(`/search?q=${encodeURIComponent(value)}`);
   };
 
@@ -159,7 +159,7 @@ const Header = () => {
               name="search"
               className="block py-1 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-foreground-red focus:outline-none focus:ring-0 focus:border-foreground-red peer"
               placeholder="what are you looking for?"
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch(e)}
+              onKeyPress={(e) => e.key === "Enter" && handleSearch(e)}
               required
             />
           </div>
@@ -176,20 +176,26 @@ const Header = () => {
                   <DropdownMenuTrigger>
                     <div className="gap-2 flex items-center p-2">
                       <UserRound size={18} />
-                      <span>{currentUser.firstName}</span>
+                      <span className="capitalize font-medium">
+                        {currentUser.firstName}
+                      </span>
                       <ChevronDown />
                     </div>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuSeparator />
-                    {role === "ADMIN" && (
+                    {(role === "ADMIN" || role === "WRITER") && (
                       <>
                         <DropdownMenuItem>
                           <Link to={"/dashboard"}>Dashboard</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          <TransitionLink href={"/favorites"} label="Favorites" />
+                          <TransitionLink
+                            href={"/favorites"}
+                            label="Favorites"
+                          />
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                       </>
                     )}
                     <DropdownMenuItem>Profile</DropdownMenuItem>
@@ -198,6 +204,7 @@ const Header = () => {
                     <DropdownMenuItem onClick={handleLogout}>
                       Logout
                     </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>

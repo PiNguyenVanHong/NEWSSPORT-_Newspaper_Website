@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type ModalType = "login-form" | "" ;
+export type ModalType = "login-form" | "update-status-article" | "update-top-heading-article" | "" ;
 
 interface ModalData{
     apiUrl?: string;

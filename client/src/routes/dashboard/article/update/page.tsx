@@ -1,8 +1,8 @@
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { CircleXIcon, PanelLeftClose, PanelLeftOpen, Trash, Trash2 } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLoaderData } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,6 +43,7 @@ import {
 import HeaderAction from "@/components/dashboard/header-action";
 import ContentArticle from "@/components/article/content";
 import { statuses } from "../_components/data";
+import { AuthContext } from "@/context/auth-context";
 
 function DashboardUpdateArticlePage() {
   const {
@@ -50,6 +51,7 @@ function DashboardUpdateArticlePage() {
     categories,
   }: { article: ArticleResponse; categories: CategoryResponse[] } =
     useLoaderData() as any;
+  const { userId } = useContext(AuthContext) as any;
 
   const breadcrumbs = [
     { label: "Pages", link: "/" },
@@ -60,6 +62,7 @@ function DashboardUpdateArticlePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState<boolean>(true);
   const [content, setContent] = useState(article.content!);
+  const editable = userId === article.user?.id;
 
   const form = useForm({
     resolver: zodResolver(formUpdateArticleSchema),
@@ -88,22 +91,20 @@ function DashboardUpdateArticlePage() {
         return;
       }
 
-      console.log(values);
+      //   const body: ArticleRequest = {
+      //     title: values.title,
+      //     content: content,
+      //     description: values.description,
+      //     link: "",
+      //     categoryId: values.categoryId,
+      //   };
+      //   const formData = new FormData();
+      //   formData.append("thumbnail", values.thumbnail[0]);
 
-    //   const body: ArticleRequest = {
-    //     title: values.title,
-    //     content: content,
-    //     description: values.description,
-    //     link: "",
-    //     categoryId: values.categoryId,
-    //   };
-    //   const formData = new FormData();
-    //   formData.append("thumbnail", values.thumbnail[0]);
+      //   const { message } = await createArticle(body, formData);
+      //   handleClose();
 
-    //   const { message } = await createArticle(body, formData);
-    //   handleClose();
-
-    //   toast.success(message);
+      //   toast.success(message);
     } catch (error) {
       if (error instanceof AxiosError)
         toast.error(error?.response?.data?.message);
@@ -153,6 +154,7 @@ function DashboardUpdateArticlePage() {
                                   {...field}
                                   type="text"
                                   placeholder="title articles...."
+                                  disabled={!editable}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -178,6 +180,7 @@ function DashboardUpdateArticlePage() {
                                   {...field}
                                   type="text"
                                   placeholder="description articles...."
+                                  disabled={!editable}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -201,6 +204,7 @@ function DashboardUpdateArticlePage() {
                               <Select
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
+                                disabled={!editable}
                               >
                                 <FormControl>
                                   <SelectTrigger className="bg-white capitalize">
@@ -228,70 +232,40 @@ function DashboardUpdateArticlePage() {
                   </SidebarGroupContent>
                 </SidebarGroup>
                 <SidebarGroup>
-                  <SidebarGroupLabel>Status</SidebarGroupLabel>
-                  <SidebarGroupContent>
-                    <SidebarMenu>
-                      <SidebarMenuItem>
-                        <FormField
-                          control={form.control}
-                          name="status"
-                          render={({ field }) => (
-                            <FormItem>
-                              <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                              >
-                                <FormControl>
-                                  <SelectTrigger className="bg-white capitalize">
-                                    <SelectValue placeholder="Select a status" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {statuses.map((item, index) => (
-                                    <SelectItem
-                                      key={item.label || index}
-                                      className="capitalize"
-                                      value={item.value.toUpperCase()!}
-                                    >
-                                      {item.label}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </SidebarMenuItem>
-                    </SidebarMenu>
-                  </SidebarGroupContent>
-                </SidebarGroup>
-                <SidebarGroup>
                   <SidebarGroupLabel>Thumbnail</SidebarGroupLabel>
                   <SidebarGroupContent>
                     <SidebarMenu>
                       <SidebarMenuItem>
                         {/* {form.getValues("thumbnail") ? ( */}
-                            <div className="h-48">
-                                <img src={formatUrlImage(form.getValues('oldThumbnail'))} alt="" />
-                            </div>
+                        <div className="w-full h-48 relative group">
+                          <img
+                            className="absolute inset-0 z-[1] w-full h-full"
+                            src={formatUrlImage(form.getValues("oldThumbnail"))}
+                            alt=""
+                          />
+                          <div className="absolute inset-0 z-[3] w-full h-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
+                            <button className="rounded-full p-2 bg-red-500 hover:opacity-80 transition-opacity">
+                              <Trash2 className="text-white" size={16} />
+                            </button>
+                          </div>
+                        </div>
                         {/* ): ( */}
-                            <FormField
-                              control={form.control}
-                              name="thumbnail"
-                              render={() => (
-                                <FormItem>
-                                  <FormControl>
-                                    <Input
-                                      {...fileRef}
-                                      type="file"
-                                      placeholder="thumbnail articles...."
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                        <FormField
+                          control={form.control}
+                          name="thumbnail"
+                          render={() => (
+                            <FormItem>
+                              <FormControl>
+                                <Input
+                                  {...fileRef}
+                                  type="file"
+                                  placeholder="thumbnail articles...."
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                         {/* )} */}
                       </SidebarMenuItem>
                     </SidebarMenu>
@@ -310,8 +284,6 @@ function DashboardUpdateArticlePage() {
             <div className="h-full flex flex-1 flex-col gap-4 p-4 pt-0">
               <div className="w-full flex items-start justify-between">
                 <div className="">
-                  <h3>Create Article</h3>
-                  <span>Check the sales, value and bounce rate by country</span>
                 </div>
                 <Button variant={"outline"} onClick={() => setOpen(!open)}>
                   {open ? <PanelLeftOpen /> : <PanelLeftClose />}
@@ -322,6 +294,7 @@ function DashboardUpdateArticlePage() {
                   onChange={onChange}
                   initialContent={content}
                   className="bg-white"
+                  editable={editable}
                 />
               </div>
             </div>

@@ -27,7 +27,7 @@ export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
   @Post()
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.WRITER)
   create(@Body() createArticleDto: CreateArticleDto, @Req() req) {
     return this.articlesService.create({
       ...createArticleDto,
@@ -36,7 +36,7 @@ export class ArticlesController {
   }
 
   @Post('uploads/:id')
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.WRITER)
   @UseInterceptors(FileInterceptor('thumbnail', multerOptions))
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
@@ -55,9 +55,29 @@ export class ArticlesController {
   findAll(
     @Query() query: string, 
     @Query("current") current: string,
+    @Query("pageSize") pageSize: string) {
+    return this.articlesService.findAll(query, +current, +pageSize);
+  }
+
+  @Get('top-heading')
+  @Public()
+  @CacheKey('all_articles')
+  @CacheTTL(1)
+  findAllTopHeading(
+    @Query() query: string, 
+    @Query("current") current: string,
+    @Query("pageSize") pageSize: string) {
+    return this.articlesService.findAllTopHeading(query, +current, +pageSize);
+  }
+
+  @Get('me')
+  findAllArticleByMe(
+    @Req() req: any,
+    @Query() query: string, 
+    @Query("current") current: string,
     @Query("pageSize") pageSize: string,
-    @Req() req: any) {
-    return this.articlesService.findAll(query, +current, +pageSize, req?.user?.role);
+  ) {
+    return this.articlesService.findAllByUserId(req.user.userId, query, +current, +pageSize);
   }
 
   @Get(':id')
@@ -90,6 +110,15 @@ export class ArticlesController {
     @Body() { status }: { status: string }
   ) {
     return this.articlesService.updateStatus(+id, status);
+  }
+
+  @Patch(':id/top-heading')
+  @Roles(Role.ADMIN)
+  updateTopHeading(
+    @Param('id') id: string,
+    @Body() { isTopHeading }: { isTopHeading: string }
+  ) {
+    return this.articlesService.updateTopHeading(+id, Boolean(isTopHeading));
   }
 
   @Delete(':id')

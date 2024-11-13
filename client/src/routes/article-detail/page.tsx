@@ -128,14 +128,12 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
             <div className="w-full flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
-                  sport
+                  { article.category?.name }
                 </div>
                 <div className="text-foreground-gray font-medium uppercase">
                   {formatDateBasis(new Date(article.createdAt!), FORMAT_DATE)}
-                  {/* {formatDateInTimeZone(article.createdAt!, FORMAT_DATE)} */}
                 </div>
               </div>
-
               <button
                 className="rounded-full p-2 border border-slate-300 hover:opacity-70 transition duration-300"
                 onClick={handleFavorite}

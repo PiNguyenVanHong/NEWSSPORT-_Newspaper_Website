@@ -4,10 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ArticlesService } from '@/modules/articles/articles.service';
 import { ArticlesController } from '@/modules/articles/articles.controller';
 import { Article } from '@/modules/articles/entities/article.entity';
-import { User } from '../users/entities/user.entity';
-import { Category } from '../categories/entities/category.entity';
-import { UsersModule } from '../users/users.module';
-import { CategoriesModule } from '../categories/categories.module';
+import { User } from '@/modules/users/entities/user.entity';
+import { Category } from '@/modules/categories/entities/category.entity';
+import { UsersModule } from '@/modules/users/users.module';
+import { CategoriesModule } from '@/modules/categories/categories.module';
 
 @Module({
   imports: [

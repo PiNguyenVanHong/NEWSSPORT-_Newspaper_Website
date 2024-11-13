@@ -23,8 +23,8 @@ export const ArticleClient: React.FC<ArticleClientProps> = ({ data, meta }) => {
     <>
       <div className="flex items-center justify-between">
         <Heading
-          title={`Articles (${data.length})`}
-          description="Manage articles for your store"
+          title={`Articles (${meta.total})`}
+          description="Manage articles for your website"
         />
         <Button onClick={() => {}}>
           <Plus className="mr-2 h-4 w-4" />

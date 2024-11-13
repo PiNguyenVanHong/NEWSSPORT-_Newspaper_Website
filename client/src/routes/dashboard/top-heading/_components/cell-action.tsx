@@ -5,7 +5,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useModal } from "@/hooks/use-modal-store";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,21 +20,22 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArticleColumn } from "@/routes/dashboard/article/_components/column";
 import { AlertModal } from "@/components/modals/alert-modal";
-import { statuses } from "@/routes/dashboard/article/_components/data";
+import { TopHeadingColumn } from "./column";
+import { useModal } from "@/hooks/use-modal-store";
+import { isTopHeading } from "./data";
 
 interface CellActionProps {
-  data: ArticleColumn;
+  data: TopHeadingColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { onOpen } = useModal();
 
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const { onOpen } = useModal();
 
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
@@ -88,17 +88,17 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </DropdownMenuItem>
           <DropdownMenuItem className="group" onClick={() => setOpen(true)}>
             <Trash className="mr-2 h-4 -4 group-hover:text-destructive tranisiton duration-300" />
-            Reject
+            Delete
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Status</DropdownMenuSubTrigger>
+            <DropdownMenuSubTrigger>Heading</DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
               <DropdownMenuRadioGroup
-                value={data.status}
+                value={data.isTopHeading}
                 onValueChange={(value) => {
-                  if (data.status !== value) {
-                    onOpen("update-status-article", {
+                  if (data.isTopHeading !== value) {
+                    onOpen("update-top-heading-article", {
                       query: {
                         articleId: data.id,
                         status: value,
@@ -109,8 +109,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                   }
                 }}
               >
-                {statuses.map((label) => (
-                  <DropdownMenuRadioItem key={label.value} value={label.value}>
+                {isTopHeading.map((label) => (
+                  <DropdownMenuRadioItem key={label.label} value={label.value}>
                     {label.label}
                   </DropdownMenuRadioItem>
                 ))}

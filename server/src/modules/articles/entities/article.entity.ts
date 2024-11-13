@@ -45,6 +45,9 @@ export class Article {
   status: string;
 
   @Column({ default: false })
+  isTopHeading: boolean;
+
+  @Column({ default: false })
   isDeleted: boolean;
 
   @Column('timestamp', { nullable: true })

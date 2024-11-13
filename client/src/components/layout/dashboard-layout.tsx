@@ -18,7 +18,7 @@ function DashboardLayoutPage() {
 
     const checkUser = async () => {
       const { role }: any = decodedToken(token);
-      if(role !== "ADMIN") navigate("/404");
+      if(role !== "ADMIN" && role !== "WRITER") navigate("/404");
     } 
 
     checkUser();

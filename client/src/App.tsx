@@ -1,9 +1,12 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import {
-  articleDashboarPageLoader,
+  articleDashboardPageLoader,
   categoryDashboardPageLoader,
   favoritesPageLoader,
+  homepageLoader,
+  ownArticleDashboardPageLoader,
   searchPageLoader,
+  topHeadingDashboardPageLoader,
   updateArticleDashboardPageLoader,
   wrapperPageLoader,
 } from "@/lib/loader";
@@ -24,6 +27,8 @@ import DashboardCreateCategoryPage from "@/routes/dashboard/category/create/page
 import DashboardArticlePage from "@/routes/dashboard/article/page";
 import DashboardCreateArticlePage from "@/routes/dashboard/article/create/page";
 import DashboardUpdateArticlePage from "@/routes/dashboard/article/update/page";
+import DashboardOwnArticlePage from "@/routes/dashboard/own-article/page";
+import DashboardTopHeadingPage from "@/routes/dashboard/top-heading/page";
 
 import LayoutPage from "@/components/layout/layout";
 import AuthLayoutPage from "@/components/layout/auth-layout";
@@ -38,6 +43,7 @@ function App() {
         {
           path: "/",
           element: <Homepage />,
+          loader: homepageLoader,
         },
         {
           path: "/:alias",
@@ -73,6 +79,11 @@ function App() {
           element: <DashboardPage />,
         },
         {
+          path: "/dashboard/top-heading",
+          element: <DashboardTopHeadingPage />,
+          loader: topHeadingDashboardPageLoader,
+        },
+        {
           path: "/dashboard/categories",
           element: <DashboardCategoryPage />,
           loader: categoryDashboardPageLoader,
@@ -84,7 +95,7 @@ function App() {
         {
           path: "/dashboard/articles",
           element: <DashboardArticlePage />,
-          loader: articleDashboarPageLoader,
+          loader: articleDashboardPageLoader,
         },
         {
           path: "/dashboard/articles/:id",
@@ -94,6 +105,20 @@ function App() {
         {
           path: "/dashboard/articles/create",
           element: <DashboardCreateArticlePage />,
+        },
+        {
+          path: "/dashboard/own-articles",
+          element: <DashboardOwnArticlePage />,
+          loader: ownArticleDashboardPageLoader,
+        },
+        {
+          path: "/dashboard/own-articles/create",
+          element: <DashboardCreateArticlePage />,
+        },
+        {
+          path: "/dashboard/own-articles/update",
+          element: <DashboardUpdateArticlePage />,
+          loader: updateArticleDashboardPageLoader,
         },
         {
           path: "/dashboard/test-table",

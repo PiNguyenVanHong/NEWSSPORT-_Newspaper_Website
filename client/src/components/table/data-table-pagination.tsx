@@ -14,19 +14,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { MetaResponse } from "@/types/user.type";
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
+  meta?: MetaResponse;
 }
 
 export function DataTablePagination<TData>({
   table,
+  meta,
 }: DataTablePaginationProps<TData>) {
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
-        {table.getFilteredSelectedRowModel().rows.length} of{" "}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
+        {table.getFilteredSelectedRowModel().rows.length} of {meta?.total}{" "}
+        row(s) selected.
+        {/* {table.getFilteredRowModel().rows.length} row(s) selected. */}
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
@@ -49,9 +53,12 @@ export function DataTablePagination<TData>({
             </SelectContent>
           </Select>
         </div>
-        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+        {/* <div className="flex w-[100px] items-center justify-center text-sm font-medium">
           Page {table.getState().pagination.pageIndex + 1} of{" "}
           {table.getPageCount()}
+        </div> */}
+        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+          Page {meta?.current} of {meta?.pages}
         </div>
         <div className="flex items-center space-x-2">
           <Button

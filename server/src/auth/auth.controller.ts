@@ -63,7 +63,7 @@ export class AuthController {
   }
 
   @Get('me')
-  @Roles(Role.USER, Role.ADMIN)
+  @Roles(Role.USER, Role.ADMIN, Role.WRITER)
   getMe(@Request() req: any) {
     const userId = req.user.userId;
     return this.authService.getMe(userId); 

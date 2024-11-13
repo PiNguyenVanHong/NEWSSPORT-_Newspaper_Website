@@ -17,6 +17,7 @@ export type ArticleResponse = {
   thumbnail?: string,
   content?: string,
   status?: string,
+  isTopHeading?: boolean,
   createdAt?: Date,
   user?: UserResponse,
   category?: CategoryResponse,

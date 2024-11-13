@@ -670,6 +670,16 @@ export const getAllArticle = async (query?: string) => {
   return data;
 };
 
+export const getAllArticleTopHeading = async (query?: string) => {
+  if (!query) query = "";
+
+  const { data } = await requestClient.get(
+    ARTICLE_ROUTES + "/top-heading"  + query
+  );
+
+  return data;
+}
+
 export const getAllArticleByCategoryId = async (categoryId: string) => {
   const { data } = await requestClient.get(ARTICLE_ROUTES, {
     params: {
@@ -690,11 +700,35 @@ export const updateStatusArticleById = async (id: string, status: string) => {
   const token = await getToken();
 
   const { data } = await requestClient.patch(
-    ARTICLE_ROUTES + "/" + id,
+    ARTICLE_ROUTES + "/" + id + "/status",
     {
-      status
+      status,
     },
+    HeaderConfig(token, false)
+  );
+
+  return data;
+};
+
+export const updateTopHeadingArticle = async (id: string, isTopHeading: boolean) => {
+  const token = await getToken();
+
+  const { data } = await requestClient.patch(
+    ARTICLE_ROUTES + "/" + id + "/top-heading",
+    { isTopHeading },
     HeaderConfig(token, false),
+  );
+
+  return data;
+};
+
+export const getArticleByMe = async (query?: string) => {
+  const token = await getToken();
+  if(!query) query = "";
+
+  const { data } = await requestClient.get(
+    ARTICLE_ROUTES + "/me" + query,
+    HeaderConfig(token),
   );
 
   return data;

@@ -5,7 +5,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useModal } from "@/hooks/use-modal-store";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,17 +12,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArticleColumn } from "@/routes/dashboard/article/_components/column";
 import { AlertModal } from "@/components/modals/alert-modal";
-import { statuses } from "@/routes/dashboard/article/_components/data";
+import { ArticleColumn } from "./column";
 
 interface CellActionProps {
   data: ArticleColumn;
@@ -32,7 +25,6 @@ interface CellActionProps {
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { onOpen } = useModal();
 
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -88,35 +80,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </DropdownMenuItem>
           <DropdownMenuItem className="group" onClick={() => setOpen(true)}>
             <Trash className="mr-2 h-4 -4 group-hover:text-destructive tranisiton duration-300" />
-            Reject
+            Delete
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Status</DropdownMenuSubTrigger>
-            <DropdownMenuSubContent>
-              <DropdownMenuRadioGroup
-                value={data.status}
-                onValueChange={(value) => {
-                  if (data.status !== value) {
-                    onOpen("update-status-article", {
-                      query: {
-                        articleId: data.id,
-                        status: value,
-                      },
-                    });
-                  } else {
-                    return;
-                  }
-                }}
-              >
-                {statuses.map((label) => (
-                  <DropdownMenuRadioItem key={label.value} value={label.value}>
-                    {label.label}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
           <DropdownMenuSeparator />
         </DropdownMenuContent>
       </DropdownMenu>

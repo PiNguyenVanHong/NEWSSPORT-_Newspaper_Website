@@ -17,7 +17,7 @@ import { CodesModule } from '@/modules/codes/codes.module';
 import { RolesModule } from '@/modules/roles/roles.module';
 import { RolesGuard } from '@/modules/roles/guards/roles.guard';
 import { SocialLinksModule } from '@/modules/social-links/social-links.module';
-import { FavoritesModule } from './modules/favorites/favorites.module';
+import { FavoritesModule } from '@/modules/favorites/favorites.module';
 
 @Module({
   imports: [

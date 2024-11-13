@@ -5,26 +5,28 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/heading";
-import { ApiList } from "@/components/api-list";
 import { DataTable } from "@/components/table/data-table";
-import { statuses } from "./data";
-import { ArticleColumn, columns } from "./column";
+import { categories, isTopHeading } from "@/routes/dashboard/top-heading/_components/data";
+import { TopHeadingColumn, columns } from "./column";
 import { MetaResponse } from "@/types/user.type";
 
-interface ArticleClientProps {
-  data: ArticleColumn[];
+interface TopHeadingClientProps {
+  data: TopHeadingColumn[];
   meta: MetaResponse;
 }
 
-export const ArticleClient: React.FC<ArticleClientProps> = ({ data, meta }) => {
-  const filterData = [{ field: "status", options: statuses }];
+export const TopHeadingClient: React.FC<TopHeadingClientProps> = ({ data, meta }) => {
+  const filterData = [
+    { field: "isTopHeading", options: isTopHeading },
+    { field: "category", options: categories },
+  ];
 
   return (
     <>
       <div className="flex items-center justify-between">
         <Heading
-          title={`Articles (${data.length})`}
-          description="Manage articles for your store"
+          title={`Top heading articles (${meta.total})`}
+          description="Manage top heading articles for your website"
         />
         <Button onClick={() => {}}>
           <Plus className="mr-2 h-4 w-4" />
@@ -39,9 +41,6 @@ export const ArticleClient: React.FC<ArticleClientProps> = ({ data, meta }) => {
         data={data}
         meta={meta}
       />
-      {/* <Heading title="API" description="API calls for Articles" />
-      <Separator /> */}
-      {/* <ApiList entityName="articles" entityIdName="categoryId" /> */}
     </>
   );
 };

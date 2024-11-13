@@ -38,59 +38,58 @@ export class CategoriesService {
     if (!current) current = 1;
     if (!pageSize) pageSize = 10;
 
-    let totalItems = (await this.categoryRepository.find(filter)).length;
-    let totalPages = Math.ceil(totalItems / pageSize);
-
     const skip = (current - 1) * pageSize;
 
-    if (Object.keys(filter).length > 0 || projection || sort) {
-      const categories = await this.categoryRepository.find({
-        select: projection,
-        skip,
-        take: pageSize,
-        where: filter,
-        order: sort,
-      });
+    const queryBuilder = this.categoryRepository
+      .createQueryBuilder('category')
+      .orderBy('category.level', 'ASC')
+      .skip(skip)
+      .take(pageSize);
 
-      return {
-        meta: {
-          current,
-          pageSize,
-          pages: totalPages,
-          total: totalItems,
-        },
-        results: categories,
-      };
-    } else {
-      const [categories, total] = await this.categoryRepository
-        .createQueryBuilder('category')
+    if (!projection) {
+      queryBuilder.select([
+        'category.id',
+        'category.name',
+        'category.alias',
+        'category.description',
+        'category.level',
+        'category.isDeleted',
+        'category.createdAt',
+      ]);
+    } else if (projection.articles) {
+      queryBuilder
         .leftJoinAndSelect('category.articles', 'article')
-        .select([
-          'category.id',
-          'category.name',
-          'category.alias',
-          'category.description',
-          'category.level',
-          'category.isDeleted',
-          'category.createdAt',
-          'article.id',
-          'article.title',
-        ])
-        .orderBy('category.level', 'ASC')
-        .getManyAndCount();
-
-      let totalPages = Math.ceil(total / pageSize);
-
-      return {
-        meta: {
-          current,
-          pageSize,
-          pages: totalPages,
-          total: total,
-        },
-        results: categories,
-      };
+        .select(['article.id', 'article.title']);
     }
+
+    if (filter.isDeleted) {
+      if (filter.isDeleted?.toUpperCase() !== 'ALL')
+        queryBuilder.andWhere('category.isDeleted = :isDeleted', {
+          isDeleted: filter.isDeleted,
+        });
+    } else {
+      queryBuilder.andWhere('category.isDeleted = :isDeleted', {
+        isDeleted: false,
+      });
+    }
+
+    if (filter.alias) {
+      queryBuilder.andWhere('category.alias = :alias', { alias: filter.alias });
+    }
+
+    const [categories, total] = await queryBuilder.getManyAndCount();
+
+    let totalPages = Math.ceil(total / pageSize);
+
+    return {
+      meta: {
+        current,
+        pageSize,
+        pages: totalPages,
+        total: total,
+      },
+      results: categories,
+    };
   }
 
   async findOne(id: string, query?: string) {

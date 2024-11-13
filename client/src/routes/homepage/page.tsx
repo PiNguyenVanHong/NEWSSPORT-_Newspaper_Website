@@ -1,54 +1,14 @@
 import Image from "@/assets/news/1.jpg";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ArrowRight, Mail } from "lucide-react";
 import { cn, generateSlug } from "@/lib/utils";
 import { formatDatePublish, formatUrlImage } from "@/lib/format";
 import { animatePageIn } from "@/lib/animations";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getAllArticle, getTopArticles } from "@/actions/article.api";
 import { ArticleResponse } from "@/types/article.type";
-import { useNavigate } from "react-router-dom";
-
-// const articles = [
-//   {
-//     id: 1,
-//     title:
-//       "White House on defensive as Manchin raises concerns about new spending",
-//     description:
-//       "No matter the eventual outcome, there was little sign that the negotiators would achive the kind of sweeping deal to battle back warming that would satisfy the demands of youth activists.",
-//     thumbnail: Image,
-//     author: [
-//       { id: "author-01", name: "PiKayQi" },
-//       { id: "author-02", name: "Tuan" },
-//     ],
-//     publishedAt: new Date(Date.now() - 10000),
-//   },
-//   {
-//     id: 2,
-//     title:
-//       "White House on defensive as Manchin raises concerns about new spending",
-//     description:
-//       "No matter the eventual outcome, there was little sign that the negotiators would achive the kind of sweeping deal to battle back warming that would satisfy the demands of youth activists.",
-//     thumbnail: Image,
-//     author: [{ id: "author-01", name: "PiKayQi" }],
-//     publishedAt: new Date(Date.now() - 10000),
-//   },
-//   {
-//     id: 3,
-//     title:
-//       "White House on defensive as Manchin raises concerns about new spending",
-//     description:
-//       "No matter the eventual outcome, there was little sign that the negotiators would achive the kind of sweeping deal to battle back warming that would satisfy the demands of youth activists.",
-//     thumbnail: Image,
-//     author: [
-//       { id: "author-01", name: "PiKayQi" },
-//       { id: "author-02", name: "Tuan" },
-//     ],
-//     publishedAt: new Date(Date.now() - 10000),
-//   },
-// ];
+import { useLoaderData, useNavigate } from "react-router-dom";
 
 const keywords = [
   {
@@ -83,29 +43,14 @@ const keywords = [
   },
 ];
 
-const hero1 = getTopArticles();
-
-interface HomepageProps {}
-
-function Homepage({}: HomepageProps) {
-  const [articles, setArticles] = useState<ArticleResponse[]>([]);
+function Homepage() {
   const navigate = useNavigate();
+
+  const { results }: { results: ArticleResponse[] } = useLoaderData() as any;
 
   useEffect(() => {
     animatePageIn();
-
-    const getData = async () => {
-      const { results } = await getAllArticle();
-
-      setArticles(results);
-    };
-
-    getData();
   }, []);
-
-  const handleClick = (link: string) => {
-    window.open(link);
-  };
 
   const onClick = (title: string, id: string) => {
     navigate(generateSlug(title, id));
@@ -116,21 +61,28 @@ function Homepage({}: HomepageProps) {
       <div className="grid grid-cols-4 gap-8 items-stretch my-6">
         <div className="col-span-1 flex flex-col items-start justify-between">
           <div className="w-full">
-            {[...hero1].slice(3, 6).map((item, index) => (
+            {results.slice(3, 6).map((item, index) => (
               <div
-                key={item.article_id}
+                key={item.id || index}
                 className={cn(
                   "flex flex-col gap-4 py-4",
                   index != 0 && "border-t-2 border-gray-300"
                 )}
-                onClick={() => handleClick(item.link)}
+                onClick={() => onClick(item.title!, item.id!)}
               >
                 <h2>{item.title}</h2>
                 <div className="line-clamp-5 text-foreground-gray font-normal">
                   {item.description}
                 </div>
                 <div className="flex flex-col gap-0.5 text-foreground-gray font-medium">
-                  {item.creator && item?.creator.length > 1 ? (
+                  <div>
+                    By{" "}
+                    <span className="text-foreground-red capitalize">
+                      {item.user?.firstName} {" "} {item.user?.lastName}
+                    </span>
+                  </div>
+
+                  {/* {item.creator && item?.creator.length > 1 ? (
                     <div className="flex gap-1.5 items-center">
                       By
                       {item.creator.map((au, index) => {
@@ -149,9 +101,9 @@ function Homepage({}: HomepageProps) {
                         {item.creator && item.creator[0]}
                       </span>
                     </div>
-                  )}
+                  )} */}
                   <div className="text-foreground-gray font-medium">
-                    {formatDatePublish(new Date(item.pubDate))}
+                    {formatDatePublish(new Date(item.createdAt!))}
                   </div>
                 </div>
               </div>
@@ -182,12 +134,12 @@ function Homepage({}: HomepageProps) {
           <div className="h-full flex flex-col items-center justify-between">
             <div
               className="h-full flex flex-col justify-between gap-2"
-              onClick={() => handleClick(hero1[0].link)}
+              onClick={() => onClick(results[0].title!, results[0].id!)}
             >
               <div className="h-96 relative">
                 <img
                   className="object-cover"
-                  src={hero1[0].image_url || Image}
+                  src={formatUrlImage(results[0].thumbnail!) || Image}
                   alt=""
                 />
                 <span className="absolute top-5 left-0 uppercase text-white px-4 py-1.5 bg-foreground-red">
@@ -195,36 +147,32 @@ function Homepage({}: HomepageProps) {
                 </span>
               </div>
               <h2 className="text-3xl font-semibold font-playfair line-clamp-3 leading-8">
-                {hero1[0].title}
-                {/* House Democrats introduce resolution to censure Rep. Gosar over
-                animated video that depicted him killing Rep. Ocasio-Cortez
-                dasdasdas sdasdsa asdasd asda ssdasd asd a d asdasd */}
+                {results[0].title}
               </h2>
               <div className="text-foreground-gray font-normal">
-                {hero1[0].description} {hero1[0].source_priority}
-                {/* No matter the eventual outcome, there was little sign that the
-                negotiators would achive the kind of sweeping deal to battle
-                back warming that would satisfy the demands of youth activists. */}
+                {results[0].description}
               </div>
               <div className="flex items-center justify-between text-foreground-gray font-medium">
                 <div>
-                  By <span className="text-foreground-red">PiKayQi</span> and
-                  <span className="text-foreground-red"> Tuan</span>
+                  By <span className="text-foreground-red capitalize">{" "}
+                    {results[0].user?.firstName}{" "}
+                    {results[0].user?.lastName}
+                    </span>
                 </div>
-                <div>{formatDatePublish(new Date(hero1[0].pubDate))}</div>
+                <div>{formatDatePublish(new Date(results[0].createdAt!))}</div>
               </div>
             </div>
             <div className="flex flex-col gap-6 mt-6">
-              {[...hero1].slice(1, 3).map((item) => (
+              {results.slice(1, 3).map((item) => (
                 <div
-                  key={item.article_id}
+                  key={item.id}
                   className="grid grid-cols-6 gap-4 pt-6 border-t-2 border-gray-300"
-                  onClick={() => handleClick(item.link)}
+                  onClick={() => onClick(item.title!, item.id!)}
                 >
                   <div className="col-span-2">
                     <img
                       className="object-cover"
-                      src={item.image_url || Image}
+                      src={formatUrlImage(item.thumbnail!) || Image}
                       alt=""
                     />
                   </div>
@@ -243,11 +191,12 @@ function Homepage({}: HomepageProps) {
                     </div>
                     <div className="flex items-center justify-between text-foreground-gray font-medium">
                       <div>
-                        By <span className="text-foreground-red">PiKayQi</span>{" "}
-                        and
-                        <span className="text-foreground-red"> Tuan</span>
+                        By <span className="text-foreground-red capitalize">{" "}
+                          {item.user?.firstName}{" "}
+                          {item.user?.lastName}
+                          </span>
                       </div>
-                      <div>{formatDatePublish(new Date(item.pubDate))}</div>
+                      <div>{formatDatePublish(new Date(item.createdAt!))}</div>
                     </div>
                   </div>
                 </div>
@@ -294,23 +243,33 @@ function Homepage({}: HomepageProps) {
           </Tabs>
           <div
             className="flex flex-col gap-2"
-            onClick={() => handleClick(hero1[hero1.length - 1].link)}
+            onClick={() => onClick(results[results.length - 1].title!, results[results.length - 1].id!)}
           >
             <div>
-              <img src={hero1[hero1.length - 1].image_url || Image} alt="" />
+              <img
+                src={
+                  formatUrlImage(results[results.length - 1].thumbnail!) ||
+                  Image
+                }
+                alt=""
+              />
             </div>
             <h3>
-              {hero1[hero1.length - 1].title}
+              {results[results.length - 1].title}
               {/* Hawley claims American manhood is broken. Where are his solutions? */}
             </h3>
             <div className="text-foreground-gray font-medium">
               <span>By</span>
-              <span className="text-foreground-red"> PiKayQi</span>
-              <span> and</span>
-              <span className="text-foreground-red"> Tuan</span>
+              <span className="text-foreground-red capitalize">
+                {" "}
+                {results[results.length - 1].user?.firstName}{" "}
+                {results[results.length - 1].user?.lastName}
+              </span>
             </div>
             <div className="text-foreground-gray font-medium">
-              {formatDatePublish(new Date(hero1[hero1.length - 1].pubDate))}
+              {formatDatePublish(
+                new Date(results[results.length - 1].createdAt!)
+              )}
             </div>
           </div>
         </div>
@@ -534,7 +493,7 @@ function Homepage({}: HomepageProps) {
           <div className="flex-1 h-0.5 bg-foreground rounded-full"></div>
         </div>
         <div className="grid grid-cols-3 gap-8 items-stretch justify-start mt-10">
-          {articles.map((item, index) => (
+          {/* {articles.map((item, index) => (
             <div
               key={item.id || index}
               className="col-span-1 flex flex-col gap-4 group"
@@ -568,8 +527,8 @@ function Homepage({}: HomepageProps) {
                 </span>
               </div>
             </div>
-          ))}
-          {/* {[...Array(3)].map((_, index) => (
+          ))} */}
+          {[...Array(3)].map((_, index) => (
             <div key={index} className="col-span-1 flex flex-col gap-4">
               <div className="h-56">
                 <img src={Image} alt="" />
@@ -596,7 +555,7 @@ function Homepage({}: HomepageProps) {
                 and <span className="text-foreground-red">PiKayQi</span>
               </div>
             </div>
-          ))} */}
+          ))}
           <div className="col-span-3 grid grid-cols-4 items-stretch gap-10 border-y-2 border-gray-300 py-8">
             {[...Array(4)].map((_, index) => (
               <div key={index} className="flex items-start gap-2">

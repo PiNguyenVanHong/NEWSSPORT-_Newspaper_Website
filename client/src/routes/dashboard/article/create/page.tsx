@@ -40,6 +40,7 @@ import { createArticle } from "@/actions/article.api";
 import { ArticleRequest } from "@/types/article.type";
 import { AxiosError } from "axios";
 import ContentArticle from "@/components/article/content";
+import { useNavigate } from "react-router-dom";
 
 function DashboardCreateArticlePage() {
   const breadcrumbs = [
@@ -47,6 +48,7 @@ function DashboardCreateArticlePage() {
     { label: "Article", link: "/dashboard/articles" },
     { label: "Create" },
   ];
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState<boolean>(true);
@@ -101,6 +103,7 @@ function DashboardCreateArticlePage() {
       handleClose();
 
       toast.success(message);
+      navigate("/dashboard/own-articles");
     } catch (error) {
       if (error instanceof AxiosError)
         toast.error(error?.response?.data?.message);

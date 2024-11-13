@@ -9,13 +9,16 @@ import { Heading } from "@/components/heading";
 import { ApiList } from "@/components/api-list";
 import { DataTable } from "@/components/table/data-table";
 import { statuses } from "./data";
+import { MetaResponse } from "@/types/user.type";
 
 interface CategoryClientProps {
     data: CategoryColumn[];
+    meta: MetaResponse;
 }
 
 export const CategoryClient: React.FC<CategoryClientProps> = ({
-    data
+    data,
+    meta
 }) => {
 
     const filterData = [
@@ -35,10 +38,10 @@ export const CategoryClient: React.FC<CategoryClientProps> = ({
                 </Button>
             </div>
             <Separator />
-            <DataTable searchKey="name" filterData={filterData} columns={columns} data={data} />
-            <Heading title="API" description="API calls for Categories" />
-            <Separator />
-            <ApiList entityName="categories" entityIdName="categoryId" />
+            <DataTable searchKey="name" filterData={filterData} columns={columns} data={data} meta={meta} />
+            {/* <Heading title="API" description="API calls for Categories" />
+            <Separator /> */}
+            {/* <ApiList entityName="categories" entityIdName="categoryId" /> */}
         </>
     );
 };

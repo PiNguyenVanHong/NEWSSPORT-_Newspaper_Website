@@ -30,7 +30,7 @@ function CategoryNewsPage({ category, articles }: CategoryNewsPageProps) {
         {category.name}
       </h1>
       {articles.length <= 0 ? (
-        <div>article empty</div>
+        <div className="w-full text-center my-20 uppercase">article empty</div>
       ) : (
         <>
           <div className="grid grid-cols-3 border border-foreground-gray items-stretch">
@@ -51,14 +51,9 @@ function CategoryNewsPage({ category, articles }: CategoryNewsPageProps) {
                   <img src={formatUrlImage(articles[0]?.thumbnail!)} alt="" />
                 </div>
                 <h2 className="text-3xl">
-                  {/* On the 'Noble Failure' of the Pre-Raphaelites, a Group Long Held
-              in 'Generally Low Repute,' in 1964 */}
                   {articles[0]?.title}
                 </h2>
                 <div className="text-foreground-gray font-normal line-clamp-4 h-20">
-                  {/* No matter the eventual outcome, there was little sign that the
-              negotiators would achive the kind of sweeping deal to battle back
-              warming that would satisfy the demands of youth activists. */}
                   {articles[0]?.description}
                 </div>
                 <div className="text-foreground-gray font-medium capitalize">
@@ -66,7 +61,6 @@ function CategoryNewsPage({ category, articles }: CategoryNewsPageProps) {
                   <span className="text-foreground-red">
                     {articles[0]?.user?.firstName} {articles[0]?.user?.lastName}
                   </span>
-                  {/* and <span className="text-foreground-red">PiKayQi</span> */}
                 </div>
               </div>
               {articles.slice(1, 3).map((item, index) => (
@@ -92,8 +86,8 @@ function CategoryNewsPage({ category, articles }: CategoryNewsPageProps) {
                   </div>
                   <div className="text-foreground-gray font-medium">
                     By{" "}
-                    <span className="text-foreground-red">
-                      {item?.user?.firstName} {item?.user?.firstName}
+                    <span className="text-foreground-red capitalize">
+                      {item?.user?.firstName} {item?.user?.lastName}
                     </span>
                     {/* and <span className="text-foreground-red">PiKayQi</span> */}
                   </div>

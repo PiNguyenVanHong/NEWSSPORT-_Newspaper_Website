@@ -5,17 +5,25 @@ import { getAllCategory, getCategoryByAlias } from "@/actions/category.api";
 import {
   getAllArticle,
   getAllArticleByCategoryId,
+  getAllArticleTopHeading,
   getArticleById,
+  getArticleByMe,
 } from "@/actions/article.api";
 import { getFavoritesByUserId } from "@/actions/favorite.api";
 
 export const homepageLoader = async () => {
   try {
-    const { results } = await getAllArticle();
-    return results;
+    const query = buildQueryString({
+      filter: {
+        current: 1,
+        pageSize: 7,
+      }
+    });
+    const { results } = await getAllArticleTopHeading(query);
+    return { results: results.sort(() => Math.random() - 0.5) };
   } catch (error) {
     console.log(error);
-    return null;
+    return { results: null };
   }
 };
 
@@ -34,7 +42,6 @@ export const wrapperPageLoader = async ({ params }: any) => {
     }
   } catch (error) {
     console.log(error);
-
     return redirect("/404");
   }
 };
@@ -105,7 +112,9 @@ export const searchPageLoader = async ({ request }: { request: Request }) => {
 export const categoryDashboardPageLoader = async () => {
   try {
     const query = buildQueryString({
-      filter: {},
+      filter: {
+        isDeleted: "ALL",
+      },
       projection: {
         id: 1,
         name: 1,
@@ -119,20 +128,28 @@ export const categoryDashboardPageLoader = async () => {
       },
     });
 
-    const data = await getAllCategory(query);
+    const { meta, results } = await getAllCategory(query);
 
-    return data;
+    return { meta, categories: results };
   } catch (error) {
     console.log(error);
     return null;
   }
 };
 
-export const articleDashboarPageLoader = async ({ request }: { request: Request }) => {
+export const articleDashboardPageLoader = async ({
+  request,
+}: {
+  request: Request;
+}) => {
   try {
-    const { current, pageSize } = queryString.parse(new URL(request.url).search);
+    const { current, pageSize } = queryString.parse(
+      new URL(request.url).search
+    );
 
-    const { meta, results } = await getAllArticle(`?current=${current}&pageSize=${pageSize}`);
+    const { meta, results } = await getAllArticle(
+      `?current=${current}&pageSize=${pageSize}&status=all`
+    );
 
     return { meta, results };
   } catch (error) {
@@ -141,14 +158,35 @@ export const articleDashboarPageLoader = async ({ request }: { request: Request 
   }
 };
 
+export const ownArticleDashboardPageLoader = async ({
+  request,
+}: {
+  request: Request;
+}) => {
+  try {
+    const { current, pageSize } = queryString.parse(
+      new URL(request.url).search
+    );
+
+    const { meta, results } = await getArticleByMe(
+      `?current=${current}&pageSize=${pageSize}&status=all`
+    );
+
+    return { meta, articles: results };
+  } catch (error) {
+    console.log(error);
+    return { meta: null, articles: [] };
+  }
+};
+
 export const updateArticleDashboardPageLoader = async ({ params }: any) => {
   try {
     const { id } = params;
-    
+
     const { result } = await getArticleById(id);
     const { results } = await getAllCategory();
 
-    return { 
+    return {
       article: result,
       categories: results,
     };
@@ -156,4 +194,15 @@ export const updateArticleDashboardPageLoader = async ({ params }: any) => {
     console.log(error);
     return { result: null, categories: [] };
   }
-}
+};
+
+export const topHeadingDashboardPageLoader = async () => {
+  try {
+    const { meta, results } = await getAllArticle();
+
+    return { meta, articles: results };
+  } catch (error) {
+    console.log(error);
+    return { meta: null, articles: []};
+  }
+};

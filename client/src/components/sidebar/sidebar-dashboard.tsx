@@ -23,6 +23,7 @@ import {
   Settings2,
   SquareTerminal,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -55,7 +56,8 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "@/context/auth-context";
 
 const data = {
   user: {
@@ -75,8 +77,8 @@ const data = {
           url: "#",
         },
         {
-          title: "Starred",
-          url: "#",
+          title: "Top Heading",
+          url: "/dashboard/top-heading",
         },
         {
           title: "Settings",
@@ -96,7 +98,7 @@ const data = {
       ],
     },
     {
-      title: "Article",
+      title: "Approved Article",
       url: "/dashboard/articles",
       icon: BookOpen,
       items: [
@@ -136,6 +138,46 @@ const data = {
   ],
   navSecondary: [
     {
+      title: "Own Article",
+      url: "/dashboard/own-articles",
+      icon: BookOpen,
+      items: [
+        {
+          title: "Create Article",
+          url: "/dashboard/own-articles/create",
+        },
+        {
+          title: "Update Article",
+          url: "/dashboard/own-articles/update",
+        },
+      ],
+    },
+    {
+      title: "Settings",
+      url: "#",
+      icon: Settings2,
+      items: [
+        {
+          title: "General",
+          url: "#",
+        },
+        {
+          title: "Team",
+          url: "#",
+        },
+        {
+          title: "Billing",
+          url: "#",
+        },
+        {
+          title: "Limits",
+          url: "#",
+        },
+      ],
+    },
+  ],
+  navThird: [
+    {
       title: "Support",
       url: "#",
       icon: LifeBuoy,
@@ -166,6 +208,8 @@ const data = {
 };
 
 const SidebarDashboard = () => {
+  const { role } = useContext(AuthContext) as any;
+
   return (
     <Sidebar variant="inset">
       <SidebarHeader>
@@ -189,10 +233,50 @@ const SidebarDashboard = () => {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Controls</SidebarGroupLabel>
+          <SidebarGroupLabel>Admin/Moderator</SidebarGroupLabel>
           <SidebarMenu className="custom-scrollbar">
-            {data.navMain.map((item) => (
+            {role === "ADMIN" && data.navMain.map((item) => (
               <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip={item.title}>
+                    <Link to={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                  {item.items?.length ? (
+                    <>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuAction className="data-[state=open]:rotate-90">
+                          <ChevronRight />
+                          <span className="sr-only">Toggle</span>
+                        </SidebarMenuAction>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {item.items?.map((subItem) => (
+                            <SidebarMenuSubItem key={subItem.title}>
+                              <SidebarMenuSubButton asChild>
+                                <Link to={subItem.url}>
+                                  <span>{subItem.title}</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </>
+                  ) : null}
+                </SidebarMenuItem>
+              </Collapsible>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Controls/USER</SidebarGroupLabel>
+          <SidebarMenu className="custom-scrollbar">
+            {data.navSecondary.map((item) => (
+              <Collapsible key={item.title} asChild>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip={item.title}>
                     <Link to={item.url}>
@@ -279,7 +363,7 @@ const SidebarDashboard = () => {
         <SidebarGroup className="mt-auto">
           <SidebarGroupContent>
             <SidebarMenu>
-              {data.navSecondary.map((item) => (
+              {data.navThird.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild size="sm">
                     <a href={item.url}>
