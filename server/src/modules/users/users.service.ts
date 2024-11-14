@@ -1,7 +1,9 @@
 import aqp from 'api-query-params';
 import { Repository } from 'typeorm';
+import { Cache } from 'cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 
 import { CreateUserDto } from '@/modules/users/dto/create-user.dto';
 import { UpdateUserDto } from '@/modules/users/dto/update-user.dto';
@@ -14,6 +16,7 @@ import { RolesService } from '@/modules/roles/roles.service';
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly codeService: CodesService,
     private readonly rolesService: RolesService,
   ) {}
@@ -64,7 +67,7 @@ export class UsersService {
       order: sort,
     });
 
-    // await this.cacheService.set(`all_user:abc:xyz`, { results: users, totalPages });
+    await this.cacheManager.set(`all_user:abc:xyz`, { results: users, totalPages });
 
     return { results: users, totalPages };
   }

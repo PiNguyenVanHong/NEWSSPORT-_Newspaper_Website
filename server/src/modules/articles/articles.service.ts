@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -14,14 +15,15 @@ import { ArticleStatus } from '@/modules/articles/entities/article.enum';
 import { CreateArticleDto } from '@/modules/articles/dto/create-article.dto';
 import { UpdateArticleDto } from '@/modules/articles/dto/update-article.dto';
 import { UpdateArticleThumbnail } from '@/modules/articles/dto/update-article-thumbnail.dto';
-// import { RedisCacheService } from '@/cache/redis-cache.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class ArticlesService {
   constructor(
     @InjectRepository(Article)
-    // private readonly cacheService: RedisCacheService,
     private readonly articleRepository: Repository<Article>,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly categoryService: CategoriesService,
     private readonly userService: UsersService,
   ) {}
@@ -138,6 +140,8 @@ export class ArticlesService {
         .take(pageSize)
         .getManyAndCount();
       let totalPages = Math.ceil(total / pageSize);
+
+      await this.cacheManager.set(`all_article:abc:xyz`, { results: articles, totalPages });
 
       return {
         meta: {

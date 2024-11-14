@@ -1,8 +1,4 @@
-import { redisStore } from 'cache-manager-redis-yet';
-import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { APP_INTERCEPTOR } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 
 import { User } from '@/modules/users/entities/user.entity';
@@ -12,6 +8,10 @@ import { CodesModule } from '@/modules/codes/codes.module';
 import { Role } from '@/modules/roles/entities/role.entity';
 import { RolesModule } from '@/modules/roles/roles.module';
 import { SocialLink } from '@/modules/social-links/entities/social-link.entity';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { redisStore } from 'cache-manager-redis-yet';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -25,7 +25,7 @@ import { SocialLink } from '@/modules/social-links/entities/social-link.entity';
             host: configService.get('REDIS_HOST'),
             port: configService.get('REDIS_PORT'),
           },
-          ttl: 1 * 1000,
+          ttl: 60 * 60 * 1000,
          }),
          inject: [ConfigService],
       }),
@@ -35,11 +35,11 @@ import { SocialLink } from '@/modules/social-links/entities/social-link.entity';
   ],
   controllers: [UsersController],
   providers: [
-    UsersService,
     {
       provide: APP_INTERCEPTOR,
       useClass: CacheInterceptor,
     },
+    UsersService,
   ],
   exports: [UsersService],
 })
