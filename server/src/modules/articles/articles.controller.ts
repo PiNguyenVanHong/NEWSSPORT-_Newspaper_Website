@@ -61,7 +61,7 @@ export class ArticlesController {
 
   @Get('top-heading')
   @Public()
-  @CacheKey('all_articles')
+  @CacheKey('top-heading_article')
   @CacheTTL(1)
   findAllTopHeading(
     @Query() query: string, 
@@ -82,6 +82,8 @@ export class ArticlesController {
 
   @Get(':id')
   @Public()
+  @CacheKey("get_article")
+  @CacheTTL(1000)
   findOne(
     @Param('id') id: string,
     @Query() query: string,

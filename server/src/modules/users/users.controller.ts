@@ -30,7 +30,7 @@ export class UsersController {
 
   @Get()
   @CacheKey("all_users")
-  // @CacheTTL()
+  @CacheTTL(1)
   findAll(
     @Query() query: string,
     @Query("current") current: string,

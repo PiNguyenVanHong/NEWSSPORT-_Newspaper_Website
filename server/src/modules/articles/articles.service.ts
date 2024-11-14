@@ -17,13 +17,14 @@ import { UpdateArticleDto } from '@/modules/articles/dto/update-article.dto';
 import { UpdateArticleThumbnail } from '@/modules/articles/dto/update-article-thumbnail.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { RedisCacheService } from '@/redis-cache/redis-cache.service';
 
 @Injectable()
 export class ArticlesService {
   constructor(
     @InjectRepository(Article)
     private readonly articleRepository: Repository<Article>,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private readonly redisCacheService: RedisCacheService,
     private readonly categoryService: CategoriesService,
     private readonly userService: UsersService,
   ) {}
@@ -81,6 +82,24 @@ export class ArticlesService {
     if (!current) current = 1;
     if (!pageSize) pageSize = 10;
 
+    if (filter.categoryId) {
+      const results = await this.redisCacheService.get(
+        `category:${filter.categoryId}:articles:${current}:${pageSize}`,
+      );
+
+      if (results) {
+        return results;
+      }
+    }
+
+    const results = await this.redisCacheService.get(
+      `all_article:${current}:${pageSize}`,
+    );
+
+    if (results) {
+      return results;
+    }
+
     const queryBuilder = this.articleRepository
       .createQueryBuilder('article')
       .leftJoinAndSelect('article.category', 'category')
@@ -129,6 +148,8 @@ export class ArticlesService {
     }
 
     if (filter.categoryId) {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+
       queryBuilder.andWhere('category.id = :categoryId', {
         categoryId: filter.categoryId,
       });
@@ -141,7 +162,19 @@ export class ArticlesService {
         .getManyAndCount();
       let totalPages = Math.ceil(total / pageSize);
 
-      await this.cacheManager.set(`all_article:abc:xyz`, { results: articles, totalPages });
+      await this.redisCacheService.set(
+        `category:${filter.categoryId}:articles:${current}:${pageSize}`,
+        {
+          meta: {
+            current,
+            pageSize,
+            pages: totalPages,
+            total: total,
+          },
+          results: articles,
+        },
+        1 * 60 * 60 * 1000,
+      );
 
       return {
         meta: {
@@ -174,6 +207,8 @@ export class ArticlesService {
       };
     }
 
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
     const skip = (current - 1) * pageSize;
 
     const [articles, total] = await queryBuilder
@@ -181,6 +216,20 @@ export class ArticlesService {
       .take(pageSize)
       .getManyAndCount();
     let totalPages = Math.ceil(total / pageSize);
+
+    await this.redisCacheService.set(
+      `all_article:${current}:${pageSize}`,
+      {
+        meta: {
+          current,
+          pageSize,
+          pages: totalPages,
+          total: total,
+        },
+        results: articles,
+      },
+      1 * 60 * 60 * 1000,
+    );
 
     return {
       meta: {
@@ -201,6 +250,16 @@ export class ArticlesService {
 
     if (!current) current = 1;
     if (!pageSize) pageSize = 10;
+
+    const results = await this.redisCacheService.get(
+      `top-heading_article:${current}:${pageSize}`,
+    );
+
+    if (results) {
+      return results;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     const queryBuilder = this.articleRepository
       .createQueryBuilder('article')
@@ -240,6 +299,20 @@ export class ArticlesService {
       .take(pageSize)
       .getManyAndCount();
     let totalPages = Math.ceil(total / pageSize);
+
+    await this.redisCacheService.set(
+      `top-heading_article:${current}:${pageSize}`,
+      {
+        meta: {
+          current,
+          pageSize,
+          pages: totalPages,
+          total: total,
+        },
+        results: articles,
+      },
+      1 * 60 * 60 * 1000,
+    );
 
     return {
       meta: {

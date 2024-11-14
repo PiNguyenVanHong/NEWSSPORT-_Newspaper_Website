@@ -6,6 +6,7 @@ import {
   Get,
   Body,
   Response,
+  Res,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request as ReqExpress, Response as ResExpress } from 'express';
@@ -17,25 +18,23 @@ import { AuthService } from '@/auth/auth.service';
 import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { LocalAuthGuard } from '@/auth/passwort/local-auth.guard';
 import { VerifyAuthDto } from '@/auth/dto/verify-auth.dto';
+import { CacheKey, CacheTTL } from '@nestjs/cache-manager';
+import { CurrentUser } from '@/decorator/current-user.decorator';
+import { User } from '@/modules/users/entities/user.entity';
+import { JwtRefreshAuthGuard } from './passwort/jwt-refresh.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async handleLogin(
-      @Request() req: ReqExpress, 
-      @Response() res: ResExpress
+    @CurrentUser() user: User,
+    @Res({ passthrough: true }) res: ResExpress,
   ) {
-    const accessToken = await this.authService.login(req.user);
-    const frontendDomain = this.configService.get<string>('FRONTEND_DOMAIN');
-    res.cookie('accessToken', accessToken, {httpOnly: true, domain: frontendDomain,})
-    return res.send({ accessToken });
+    await this.authService.login(user, res);
   }
 
   @Public()
@@ -45,15 +44,12 @@ export class AuthController {
   }
 
   @Post('logout')
-  async handelLogout(
-    @Body() body: any,
-    @Response() res: ResExpress
-  ) {
+  async handelLogout(@Body() body: any, @Response() res: ResExpress) {
     await this.authService.logout(body);
-    const frontendDomain = this.configService.get<string>('FRONTEND_DOMAIN');
-    res.cookie('accessToken', null, { httpOnly: true, domain: frontendDomain})
+    // const frontendDomain = this.configService.get<string>('FRONTEND_DOMAIN');
+    // res.cookie('accessToken', null, { httpOnly: true, domain: frontendDomain });
 
-    return res.send({ message: "Logout Successfully!!!" })
+    return res.send({ message: 'Logout Successfully!!!' });
   }
 
   @Public()
@@ -63,10 +59,33 @@ export class AuthController {
   }
 
   @Get('me')
+  @CacheKey('get_me')
+  @CacheTTL(1)
   @Roles(Role.USER, Role.ADMIN, Role.WRITER)
   getMe(@Request() req: any) {
     const userId = req.user.userId;
-    return this.authService.getMe(userId); 
+    return this.authService.getMe(userId);
+  }
+
+  @Post('refresh-token')
+  @UseGuards(JwtRefreshAuthGuard)
+  @CacheKey('refresh_token')
+  @CacheTTL(1)
+  async hanleRefreshToken(
+    @CurrentUser() user: User,
+    @Res({ passthrough: true }) res: ResExpress,
+  ) {
+    // const { accessToken, refreshToken } = (await this.authService.refreshToken(
+    //   req.cookies.refreshToken,
+    // )) as any;
+
+    // const frontendDomain = this.configService.get<string>('FRONTEND_DOMAIN');
+    // res.cookie('refreshToken', refreshToken, {
+    //   httpOnly: true,
+    //   domain: frontendDomain,
+    // });
+    // return res.send({ accessToken });
+    await this.authService.login(user, res);
   }
 
   @Get('mail')

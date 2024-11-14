@@ -9,25 +9,29 @@ import { LocalStrategy } from '@/auth/passwort/local.strategy';
 import { UsersModule } from '@/modules/users/users.module';
 import { JwtStrategy } from '@/auth/passwort/jwt.strategy';
 import { CodesModule } from '@/modules/codes/codes.module';
+import { RedisCacheModule } from '@/redis-cache/redis-cache.module';
+import { JwtRefreshAuthGuard } from './passwort/jwt-refresh.guard';
 
 @Module({
   imports: [
+    RedisCacheModule,
     UsersModule,
     CodesModule,
     PassportModule,
     ConfigModule,
-    JwtModule.registerAsync({
-      useFactory: async (configService: ConfigService) => ({
-        global: true,
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: configService.get<string | number>('JWT_ACCESS_TOKEN_EXPRIED'),
-        },
-      }),
-      inject: [ConfigService],
-    }),
+    JwtModule,
+    // JwtModule.registerAsync({
+    //   useFactory: async (configService: ConfigService) => ({
+    //     global: true,
+    //     secret: configService.get<string>('JWT_SECRET'),
+    //     signOptions: {
+    //       expiresIn: configService.get<string | number>('JWT_ACCESS_TOKEN_EXPRIED'),
+    //     },
+    //   }),
+    //   inject: [ConfigService],
+    // }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshAuthGuard],
 })
 export class AuthModule {}

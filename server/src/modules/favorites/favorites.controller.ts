@@ -14,6 +14,7 @@ import { Request as ReqExpress } from 'express';
 import { FavoritesService } from '@/modules/favorites/favorites.service';
 import { CreateFavoriteDto } from '@/modules/favorites/dto/create-favorite.dto';
 import { UpdateFavoriteDto } from '@/modules/favorites/dto/update-favorite.dto';
+import { CacheKey, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('favorites')
 export class FavoritesController {
@@ -36,6 +37,8 @@ export class FavoritesController {
   }
 
   @Get('check')
+  @CacheKey("check_article")
+  @CacheTTL(1000)
   isFavorite(
     @Query() { articleId }: { articleId: string },
     @Req() req: any

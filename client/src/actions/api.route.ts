@@ -13,6 +13,7 @@ export const REGISTER_ROUTE = `${AUTH_ROUTES}/register`;
 export const LOG_OUT_ROUTE = `${AUTH_ROUTES}/logout`;
 export const VERIFY_REGISTER_ROUTE = `${AUTH_ROUTES}/verify`;
 export const GET_ME_ROUTE = `${AUTH_ROUTES}/me`;
+export const REFRESH_TOKEN_ROUTE = `${AUTH_ROUTES}/refresh-token`;
 
 export const GET_ALL_CATEGORY = `${CATEGORY_ROUTES}`;
 export const CREATE_CATEGORY = `${CATEGORY_ROUTES}`;

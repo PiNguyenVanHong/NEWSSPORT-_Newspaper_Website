@@ -15,6 +15,7 @@ import { Role } from '@/modules/roles/role.enum';
 import { CategoriesService } from '@/modules/categories/categories.service';
 import { CreateCategoryDto } from '@/modules/categories/dto/create-category.dto';
 import { UpdateCategoryDto } from '@/modules/categories/dto/update-category.dto';
+import { CacheKey, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('categories')
 export class CategoriesController {
@@ -28,6 +29,8 @@ export class CategoriesController {
 
   @Get()
   @Public()
+  @CacheKey("all_category")
+  @CacheTTL(1)
   findAll(
     @Query() query: string,
     @Query('current') current: string,

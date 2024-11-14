@@ -11,12 +11,13 @@ import { User } from '@/modules/users/entities/user.entity';
 import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { CodesService } from '@/modules/codes/codes.service';
 import { RolesService } from '@/modules/roles/roles.service';
+import { RedisCacheService } from '@/redis-cache/redis-cache.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private readonly redisCacheService: RedisCacheService,
     private readonly codeService: CodesService,
     private readonly rolesService: RolesService,
   ) {}
@@ -67,7 +68,7 @@ export class UsersService {
       order: sort,
     });
 
-    await this.cacheManager.set(`all_user:abc:xyz`, { results: users, totalPages });
+    await this.redisCacheService.set(`all_user:${skip}:${pageSize}`, { results: users, totalPages });
 
     return { results: users, totalPages };
   }

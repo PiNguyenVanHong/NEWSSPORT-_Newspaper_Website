@@ -18,6 +18,7 @@ import { RolesModule } from '@/modules/roles/roles.module';
 import { RolesGuard } from '@/modules/roles/guards/roles.guard';
 import { SocialLinksModule } from '@/modules/social-links/social-links.module';
 import { FavoritesModule } from '@/modules/favorites/favorites.module';
+import { RedisCacheModule } from './redis-cache/redis-cache.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { FavoritesModule } from '@/modules/favorites/favorites.module';
     RolesModule,
     SocialLinksModule,
     FavoritesModule,
+    RedisCacheModule,
   ],
   controllers: [AppController],
   providers: [
