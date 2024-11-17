@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 
 import { UsersService } from '@/modules/users/users.service';
@@ -15,7 +16,11 @@ import { UpdateUserDto } from '@/modules/users/dto/update-user.dto';
 import { Role } from '@/modules/roles/role.enum';
 import { Roles } from '@/decorator/roles.decorator';
 import { CacheKey, CacheTTL } from '@nestjs/cache-manager';
+import { JwtAuthGuard } from '@/auth/passwort/jwt-auth.guard';
+import { RolesGuard } from '@/modules/roles/guards/roles.guard';
 
+@UseGuards(RolesGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(

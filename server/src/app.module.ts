@@ -82,10 +82,10 @@ import { RedisCacheModule } from './redis-cache/redis-cache.module';
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: JwtAuthGuard,
+    // },
     {
       provide: APP_GUARD,
       useClass: RolesGuard,

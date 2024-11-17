@@ -10,7 +10,7 @@ import { UsersModule } from '@/modules/users/users.module';
 import { JwtStrategy } from '@/auth/passwort/jwt.strategy';
 import { CodesModule } from '@/modules/codes/codes.module';
 import { RedisCacheModule } from '@/redis-cache/redis-cache.module';
-import { JwtRefreshAuthGuard } from './passwort/jwt-refresh.guard';
+import { JwtRefreshStrategy } from './passwort/jwt-refresh.strategy';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { JwtRefreshAuthGuard } from './passwort/jwt-refresh.guard';
     CodesModule,
     PassportModule,
     ConfigModule,
-    JwtModule,
+    JwtModule.register({}),
     // JwtModule.registerAsync({
     //   useFactory: async (configService: ConfigService) => ({
     //     global: true,
@@ -32,6 +32,6 @@ import { JwtRefreshAuthGuard } from './passwort/jwt-refresh.guard';
     // }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshAuthGuard],
+  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshStrategy],
 })
 export class AuthModule {}

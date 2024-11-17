@@ -84,6 +84,19 @@ export class UsersService {
     return await this.userRepository.findOneBy({ id });
   }
 
+  async findAuthOne(id: string) {
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.role', 'role')
+      .select([
+        'user.id',
+        'user.email',
+        'role.id',
+        'role.code'
+      ])
+      .getOne();
+  }
+
   async findByEmail(email: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { email },

@@ -1,8 +1,13 @@
 import { JwtService } from '@nestjs/jwt';
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 
 import { UsersService } from '@/modules/users/users.service';
-import { comparePassword } from '@/helpers/util';
+import { comparePassword, hashPassword } from '@/helpers/util';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { User } from '@/modules/users/entities/user.entity';
 import { VerifyAuthDto } from './dto/verify-auth.dto';
@@ -28,51 +33,67 @@ export class AuthService {
   async validateUser(email: string, pass: string): Promise<User | null> {
     const user = await this.userService.findByEmail(email);
 
-    if(!user) {
-      throw new BadRequestException("Your email is not exist!!!");
+    if (!user) {
+      throw new BadRequestException('Your email is not exist!!!');
     }
 
     if (!(await comparePassword(pass, user.password))) {
-      throw new BadRequestException("Password is not match!!!");
+      throw new BadRequestException('Password is not match!!!');
     }
 
     return user;
   }
 
+  generateAccessToken(payload: TokenPayload) {
+    return this.jwtService.sign(payload, {
+      secret: this.configService.getOrThrow('JWT_ACCESS_TOKEN_SECRET'),
+      expiresIn: `${this.configService.getOrThrow('JWT_ACCESS_TOKEN_EXPIRATION_MS')}ms`,
+    });
+  }
+
+  generateRefreshToken(payload: TokenPayload) {
+    return this.jwtService.sign(payload, {
+      secret: this.configService.getOrThrow('JWT_REFRESH_TOKEN_SECRET'),
+      expiresIn: `${this.configService.getOrThrow(
+        'JWT_REFRESH_TOKEN_EXPIRATION_MS',
+      )}ms`,
+    });
+  }
+
   async login(user: User, res: Response): Promise<Object> {
     const tokenPayload: TokenPayload = { sub: user.id, role: user.role.code };
-    const age = 60 * 60 * 1;
-    const expiresRefreshToken = new Date(Date.now() + 5 * 1000);
 
-    const accessToken = this.jwtService.sign(
-      tokenPayload, 
-      { 
-        secret: this.configService.getOrThrow('JWT_SECRET'),
-        expiresIn: age 
-      },
+    const expiresRefreshToken = new Date();
+    expiresRefreshToken.setTime(
+      expiresRefreshToken.getTime() +
+        parseInt(
+          this.configService.getOrThrow<string>(
+            'JWT_REFRESH_TOKEN_EXPIRATION_MS',
+          ),
+        ),
     );
 
-    const refreshToken = this.jwtService.sign(
-      tokenPayload, 
-      { 
-        secret: this.configService.getOrThrow('JWT_REFRESH_TOKEN_SECRET'),
-        expiresIn: age * 24 * 7
-      },
-    );
+    const accessToken = this.generateAccessToken(tokenPayload);
+
+    const refreshToken = this.generateRefreshToken(tokenPayload);
 
     await this.redisCacheService.set(
-      `auth:${user.id}`, { 
-        accessToken, 
-        refreshToken: await hash(refreshToken, 10) 
-      }, 3 * 60 * 60 * 1000
+      `auth:${user.id}`,
+      {
+        accessToken,
+        refreshToken: await hashPassword(refreshToken),
+      },
+      parseInt(
+        this.configService.getOrThrow('JWT_REFRESH_TOKEN_EXPIRATION_MS'),
+      ),
     );
 
-    const frontendDomain = this.configService.get<string>('FRONTEND_DOMAIN');
+    // const frontendDomain = this.configService.get<string>('FRONTEND_DOMAIN');
 
     res.cookie('refresh', refreshToken, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
-      domain: frontendDomain,
+      // domain: frontendDomain,
       expires: expiresRefreshToken,
     });
 
@@ -85,6 +106,10 @@ export class AuthService {
   }
 
   async logout(data: any) {
+    // TODO: 
+    // Delete key in redis by userId
+    // Remove in cookie for response.
+
     console.log(data.userId);
   }
 
@@ -113,30 +138,35 @@ export class AuthService {
   }
 
   async refreshToken(token: string, userId: string) {
-    if(!token) {
-      throw new UnauthorizedException("Access Token is not valid!!!");
+    try {
+      if (!token) {
+        throw new UnauthorizedException('Access Token is not valid!!!');
+      }
+
+      const user = await this.userService.findAuthOne(userId);
+
+      if (!user) {
+        throw new NotFoundException("Your account doesn't exist!!!");
+      }
+
+      const { sub } = await this.jwtService.decode(token);
+
+      const { accessToken, refreshToken } = await this.redisCacheService.get(
+        `auth:${sub}`,
+      );
+
+      if (!accessToken || !refreshToken) {
+        throw new UnauthorizedException('Your token is not valid!!!');
+      }
+
+      if (!(await comparePassword(token, refreshToken))) {
+        throw new UnauthorizedException('Your token is not valid!!!');
+      }
+
+      return user;
+    } catch (error) {
+      return null;
     }
-
-    const user = await this.userService.findOne(userId);
-
-    if(!user) {
-      throw new NotFoundException("Your account doesn't exist!!!");
-    }
-
-    const { sub, role, exp } = await this.jwtService.verifyAsync(token);
-
-    if(exp <= Date.now()) {
-      throw new UnauthorizedException("Your login is expired!!!");
-    }
-
-    const payload = { sub, role };
-    const age = 60 * 60 * 24;
-
-    const accessToken =  await this.jwtService.signAsync(payload, { expiresIn: age });
-    const refreshToken  =  await this.jwtService.signAsync(payload, { expiresIn: age * 2 });
-
-    await this.redisCacheService.set(`auth:${sub}`, { accessToken, refreshToken }, 3 * 60 * 60 * 1000);
-    return { accessToken, refreshToken };
   }
 
   async sendMail(verifyAuthDto: VerifyAuthDto) {
@@ -144,20 +174,19 @@ export class AuthService {
 
     const user = await this.userService.findByEmail(email);
 
-    await this.mailerService
-      .sendMail({
-        to: email, 
-        subject: 'Testing Nest MailerModule ✔', 
-        text: 'welcome', 
-        template: "register",
-        context: {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          code,
-        }
-      });
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Testing Nest MailerModule ✔',
+      text: 'welcome',
+      template: 'register',
+      context: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        code,
+      },
+    });
 
-      return { message: "Please check your email!!!" };
+    return { message: 'Please check your email!!!' };
   }
 
   async getMe(id: string): Promise<Object> {

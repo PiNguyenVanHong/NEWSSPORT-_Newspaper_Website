@@ -24,14 +24,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  handleRequest(err: any, user: any, info: { name: string; }) {
-    if(info?.name === 'TokenExpiredError') {
-      throw new UnauthorizedException("Your login is expired!!!");
-    }
+  // handleRequest(err: any, user: any, info: { name: string; }) {
+  //   if(info?.name === 'TokenExpiredError') {
+  //     throw new UnauthorizedException("Your login is expired!!!");
+  //   }
 
-    if (err || !user) {
-      throw err || new UnauthorizedException('Access Token is not valid!!!');
-    }
-    return user;
-  }
+  //   if (err || !user) {
+  //     throw err || new UnauthorizedException('Access Token is not valid!!!');
+  //   }
+  //   return user;
+  // }
 }

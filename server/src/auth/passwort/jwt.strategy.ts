@@ -1,6 +1,6 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 import { RedisCacheService } from '@/redis-cache/redis-cache.service';
@@ -20,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
         if(!authHeader) return null;
 
-        const { sub } = await this.jwtService.verifyAsync(authHeader);
+        const { sub } = await this.jwtService.decode(authHeader);
 
         const { accessToken, refreshToken } = await this.redisCacheService.get(`auth:${sub}`);
 
@@ -31,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         return authHeader;
       },
       ignoreExpiration: false,
-      secretOrKey: configService.getOrThrow('JWT_SECRET'),
+      secretOrKey: configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
     });
   }
 

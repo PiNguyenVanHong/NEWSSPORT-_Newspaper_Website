@@ -7,6 +7,7 @@ import {
   Body,
   Response,
   Res,
+  Req,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request as ReqExpress, Response as ResExpress } from 'express';
@@ -22,6 +23,8 @@ import { CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { CurrentUser } from '@/decorator/current-user.decorator';
 import { User } from '@/modules/users/entities/user.entity';
 import { JwtRefreshAuthGuard } from './passwort/jwt-refresh.guard';
+import { JwtAuthGuard } from './passwort/jwt-auth.guard';
+import { RolesGuard } from '@/modules/roles/guards/roles.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -61,31 +64,22 @@ export class AuthController {
   @Get('me')
   @CacheKey('get_me')
   @CacheTTL(1)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
   @Roles(Role.USER, Role.ADMIN, Role.WRITER)
   getMe(@Request() req: any) {
     const userId = req.user.userId;
     return this.authService.getMe(userId);
   }
 
-  @Post('refresh-token')
+  @Post('refresh')
   @UseGuards(JwtRefreshAuthGuard)
-  @CacheKey('refresh_token')
-  @CacheTTL(1)
   async hanleRefreshToken(
     @CurrentUser() user: User,
     @Res({ passthrough: true }) res: ResExpress,
   ) {
-    // const { accessToken, refreshToken } = (await this.authService.refreshToken(
-    //   req.cookies.refreshToken,
-    // )) as any;
-
-    // const frontendDomain = this.configService.get<string>('FRONTEND_DOMAIN');
-    // res.cookie('refreshToken', refreshToken, {
-    //   httpOnly: true,
-    //   domain: frontendDomain,
-    // });
-    // return res.send({ accessToken });
-    await this.authService.login(user, res);
+    // await this.authService.login(user, res);
+    return 'oke';
   }
 
   @Get('mail')
