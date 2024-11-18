@@ -1,4 +1,4 @@
-import axios from "axios";
+import { APIClient } from "@/actions/api.request";
 
 export const HOST = import.meta.env.VITE_PUBLIC_BACKEND_URL;
 
@@ -13,32 +13,26 @@ export const REGISTER_ROUTE = `${AUTH_ROUTES}/register`;
 export const LOG_OUT_ROUTE = `${AUTH_ROUTES}/logout`;
 export const VERIFY_REGISTER_ROUTE = `${AUTH_ROUTES}/verify`;
 export const GET_ME_ROUTE = `${AUTH_ROUTES}/me`;
-export const REFRESH_TOKEN_ROUTE = `${AUTH_ROUTES}/refresh-token`;
+export const REFRESH_TOKEN_ROUTE = `${AUTH_ROUTES}/refresh`;
 
 export const GET_ALL_CATEGORY = `${CATEGORY_ROUTES}`;
 export const CREATE_CATEGORY = `${CATEGORY_ROUTES}`;
 
 
-export const requestClient = axios.create({
-  timeout: 20000,
-  withCredentials: true,
-});
+export const requestClient = new APIClient(HOST);
 
 export const HeaderConfig = (token: string, isFile?: boolean) => {
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+  };
+
   if (isFile) {
-    return {
-      headers: {
-        Accept: "application/json",
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${token}`,
-      },
-    };
-  } else {
-      return {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      };
+    headers["Content-Type"] = "multipart/form-data";
   }
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  return { headers };
 };

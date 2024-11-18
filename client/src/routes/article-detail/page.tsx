@@ -1,6 +1,6 @@
 import Image from "@/assets/news/1.jpg";
 
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn, generateSlug } from "@/lib/utils";
 import { animatePageIn } from "@/lib/animations";
@@ -13,9 +13,14 @@ import BreadcrumbCustom from "@/components/breadcumb-custom";
 import { ArticleResponse } from "@/types/article.type";
 import ContentArticle from "@/components/article/content";
 import { Bookmark, BookmarkCheck } from "lucide-react";
-import { addFavorite, checkFavoriteByArticleId, removeFavorite } from "@/actions/favorite.api";
+import {
+  addFavorite,
+  checkFavoriteByArticleId,
+  removeFavorite,
+} from "@/actions/favorite.api";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
+import { AuthContext } from "@/context/auth-context";
 
 const socials = [
   { id: 1, name: "Facebook", link: "/" },
@@ -43,6 +48,7 @@ interface ArticleDetailPageProps {
 function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { userId }: any = useContext(AuthContext);
 
   const [isFavorite, setIsFavorite] = useState(false);
   const divRef = useRef<HTMLDivElement>(null);
@@ -56,14 +62,17 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
   ];
 
   useEffect(() => {
+    if (!userId) {
+      return;
+    }
+
     const checkFavorite = async () => {
       const { result } = await checkFavoriteByArticleId(article.id!);
-
       setIsFavorite(result);
     };
 
     checkFavorite();
-  }, []); 
+  }, []);
 
   useEffect(() => {
     if (!alias.includes(".html")) navigate("/404");
@@ -79,7 +88,7 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
   }, [alias, article]);
 
   const handleFavorite = () => {
-    if(isFavorite) {
+    if (isFavorite) {
       toast.promise(removeFavorite(article.id!), {
         loading: "Loading...",
         success: ({ message }: { message: string }) => {
@@ -87,7 +96,8 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
           return message;
         },
         error: (error) => {
-          if (error instanceof AxiosError) return error?.response?.data?.message;
+          if (error instanceof AxiosError)
+            return error?.response?.data?.message;
           else {
             console.log(error);
             return "Something went wrong!!!";
@@ -102,7 +112,8 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
           return message;
         },
         error: (error) => {
-          if (error instanceof AxiosError) return error?.response?.data?.message;
+          if (error instanceof AxiosError)
+            return error?.response?.data?.message;
           else {
             console.log(error);
             return "Something went wrong!!!";
@@ -128,22 +139,24 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
             <div className="w-full flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="uppercase px-4 py-1 border-2 border-foreground-red text-foreground-red font-medium">
-                  { article.category?.name }
+                  {article.category?.name}
                 </div>
                 <div className="text-foreground-gray font-medium uppercase">
                   {formatDateBasis(new Date(article.createdAt!), FORMAT_DATE)}
                 </div>
               </div>
-              <button
-                className="rounded-full p-2 border border-slate-300 hover:opacity-70 transition duration-300"
-                onClick={handleFavorite}
-              >
-                {isFavorite ? (
-                  <BookmarkCheck className="text-emerald-500" size={20} />
-                ) : (
-                  <Bookmark size={20} />
-                )}
-              </button>
+              {userId && (
+                <button
+                  className="rounded-full p-2 border border-slate-300 hover:opacity-70 transition duration-300"
+                  onClick={handleFavorite}
+                >
+                  {isFavorite ? (
+                    <BookmarkCheck className="text-emerald-500" size={20} />
+                  ) : (
+                    <Bookmark size={20} />
+                  )}
+                </button>
+              )}
             </div>
             <h2 className="text-3xl">{article.title}</h2>
             {/* <div className="w-full h-96">

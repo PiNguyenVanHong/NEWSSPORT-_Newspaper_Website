@@ -15,25 +15,27 @@ import { FavoritesService } from '@/modules/favorites/favorites.service';
 import { CreateFavoriteDto } from '@/modules/favorites/dto/create-favorite.dto';
 import { UpdateFavoriteDto } from '@/modules/favorites/dto/update-favorite.dto';
 import { CacheKey, CacheTTL } from '@nestjs/cache-manager';
+import { CurrentUser } from '@/decorator/current-user.decorator';
+import { User } from '../users/entities/user.entity';
 
 @Controller('favorites')
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
   @Post()
-  create(@Body() { articleId }: { articleId: string }, @Req() req: any) {
-    const createFavoriteDto: CreateFavoriteDto = { articleId: articleId, userId: req.user.userId };
+  create(@Body() { articleId }: { articleId: string }, @CurrentUser() user: User) {
+    const createFavoriteDto: CreateFavoriteDto = { articleId: articleId, userId: user.id };
     return this.favoritesService.create(createFavoriteDto);
   }
 
   @Get()
-  findAll(@Req() req: any) {
-    return this.favoritesService.findAll(req.user.userId);
+  findAll(@CurrentUser() user: User) {
+    return this.favoritesService.findAll(user.id);
   }
 
   @Get('me')
-  findAllByUserId(@Req() req: any) {
-    return this.favoritesService.findAllByUserId(req.user.userId);
+  findAllByUserId(@CurrentUser() user: User) {
+    return this.favoritesService.findAllByUserId(user.id);
   }
 
   @Get('check')
@@ -41,9 +43,9 @@ export class FavoritesController {
   @CacheTTL(1000)
   isFavorite(
     @Query() { articleId }: { articleId: string },
-    @Req() req: any
+    @CurrentUser() user: User
   ) {
-    return this.favoritesService.isFavorite(req.user.userId, +articleId);
+    return this.favoritesService.isFavorite(user.id, +articleId);
   }
 
   @Get(':id')
@@ -67,8 +69,8 @@ export class FavoritesController {
   @Delete()
   removeByUserIdAndArticleId(
     @Body() { articleId }: { articleId: string },
-    @Req() req: any,
+    @CurrentUser() user: User,
   ) {
-    return this.favoritesService.removeByUserIdAndArticleId(req.user.userId, +articleId);
+    return this.favoritesService.removeByUserIdAndArticleId(user.id, +articleId);
   }
 }

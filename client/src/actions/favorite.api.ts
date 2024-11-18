@@ -1,7 +1,7 @@
 import { getToken } from "@/lib/utils";
 import { FAVORITE_ROUTES, HeaderConfig, requestClient } from "./api.route";
 
-export const getFavoritesByUserId = async (query?: string) => {
+export const getFavoritesByUserId = async (query?: string): Promise<any> => {
   if (!query) query = "";
 
   const token = await getToken();
@@ -14,7 +14,7 @@ export const getFavoritesByUserId = async (query?: string) => {
   return data;
 };
 
-export const addFavorite = async (articleId: string) => {
+export const addFavorite = async (articleId: string): Promise<any> => {
   const token = await getToken();
 
   const { data } = await requestClient.post(
@@ -26,7 +26,7 @@ export const addFavorite = async (articleId: string) => {
   return data;
 };
 
-export const removeFavorite = async (articleId: string) => {
+export const removeFavorite = async (articleId: string): Promise<any> => {
   const token = await getToken();
 
   const { data: result } = await requestClient.delete(FAVORITE_ROUTES, {
@@ -40,7 +40,7 @@ export const removeFavorite = async (articleId: string) => {
   return result;
 };
 
-export const checkFavoriteByArticleId = async (articleId: string) => {
+export const checkFavoriteByArticleId = async (articleId: string): Promise<any> => {
   const token = await getToken();
 
   const { data } = await requestClient.get(

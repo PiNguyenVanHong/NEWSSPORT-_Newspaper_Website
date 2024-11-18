@@ -44,19 +44,14 @@ const Header = () => {
   const [navbars, setNavbars] = useState<CategoryResponse[]>([]);
 
   useEffect(() => {
-    if (!token) {
-      setCurrentUser(null);
-      return;
-    }
-
     const getUser = async () => {
       try {
         const userInfo = await getMe(token);
         setCurrentUser(userInfo);
       } catch (error) {
         if (error instanceof AxiosError) {
+          console.log(error);
           toast.error(error?.response?.data?.message);
-          navigate("/sign-in");
         } else {
           console.log(error);
           toast.error("Something went wrong!!!");
@@ -93,7 +88,10 @@ const Header = () => {
     };
 
     getNavbar();
-    getUser();
+
+    if (token) {
+      getUser();
+    }
   }, [token]);
 
   const switchLanguage = (lng: "en" | "vi") => {
@@ -114,7 +112,7 @@ const Header = () => {
       navigate("/");
     } catch (error) {
       console.log(error);
-      toast.error("Something wen wrong!!!");
+      toast.error("Something went wrong!!!");
     }
   };
 

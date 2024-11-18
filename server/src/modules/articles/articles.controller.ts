@@ -8,7 +8,6 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
-  Req,
   Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -21,6 +20,8 @@ import { CreateArticleDto } from '@/modules/articles/dto/create-article.dto';
 import { UpdateArticleDto } from '@/modules/articles/dto/update-article.dto';
 import { Public } from '@/decorator/auth.decorator';
 import { CacheKey, CacheTTL } from '@nestjs/cache-manager';
+import { CurrentUser } from '@/decorator/current-user.decorator';
+import { User } from '@/modules/users/entities/user.entity';
 
 @Controller('articles')
 export class ArticlesController {
@@ -28,10 +29,10 @@ export class ArticlesController {
 
   @Post()
   @Roles(Role.ADMIN, Role.WRITER)
-  create(@Body() createArticleDto: CreateArticleDto, @Req() req) {
+  create(@Body() createArticleDto: CreateArticleDto, @CurrentUser() user: User) {
     return this.articlesService.create({
       ...createArticleDto,
-      userId: req.user.userId,
+      userId: user.id,
     });
   }
 
@@ -72,12 +73,12 @@ export class ArticlesController {
 
   @Get('me')
   findAllArticleByMe(
-    @Req() req: any,
+    @CurrentUser() user: User,
     @Query() query: string, 
     @Query("current") current: string,
     @Query("pageSize") pageSize: string,
   ) {
-    return this.articlesService.findAllByUserId(req.user.userId, query, +current, +pageSize);
+    return this.articlesService.findAllByUserId(user.id, query, +current, +pageSize);
   }
 
   @Get(':id')

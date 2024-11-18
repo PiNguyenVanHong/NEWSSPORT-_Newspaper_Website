@@ -11,7 +11,7 @@ export const getAllCategory = async (
   query?: string,
   current?: string,
   pageSize?: string
-) => {
+): Promise<any> => {
   if (!query) query = "?";
 
   const { data } = await requestClient.get(
@@ -21,7 +21,7 @@ export const getAllCategory = async (
   return data;
 };
 
-export const getCategoryByAlias = async (alias: string) => {
+export const getCategoryByAlias = async (alias: string): Promise<any> => {
   const { data } = await requestClient.get(CATEGORY_ROUTES, {
     params: {
       alias: alias.replace("/", ""),
@@ -31,7 +31,7 @@ export const getCategoryByAlias = async (alias: string) => {
   return data;
 };
 
-export const createCategory = async (body: CategoryRequest) => {
+export const createCategory = async (body: CategoryRequest): Promise<any> => {
   const token = await getToken();
 
   const { data } = await requestClient.post(

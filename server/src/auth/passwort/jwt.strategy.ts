@@ -1,41 +1,32 @@
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import { RedisCacheService } from '@/redis-cache/redis-cache.service';
-import { JwtService } from '@nestjs/jwt';
-import { TokenPayload } from '../token-payload.interface';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+
+import { TokenPayload } from '@/auth/token-payload.interface';
+import { AuthService } from '@/auth/auth.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     public configService: ConfigService,
-    private readonly jwtService: JwtService,
-    private readonly redisCacheService: RedisCacheService,
+    private readonly authService: AuthService,
   ) {
     super({
-      jwtFromRequest: async (req: Request) => {
+      jwtFromRequest: (req: Request) => {
         const authHeader = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
 
         if(!authHeader) return null;
 
-        const { sub } = await this.jwtService.decode(authHeader);
-
-        const { accessToken, refreshToken } = await this.redisCacheService.get(`auth:${sub}`);
-
-        if(!accessToken && !refreshToken) {
-          return null;
-        }
-
         return authHeader;
       },
-      ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
+      secretOrKey: configService.getOrThrow('JWT_ACCESS_TOKEN_SECRET'),
+      passReqToCallback: true,
     });
   }
 
-  async validate(payload: TokenPayload) {
-    return { userId: payload.sub, role: payload.role };
+  async validate(req: Request, payload: TokenPayload) {
+    return await this.authService.verifyAccessToken(req.headers.authorization?.split(' ')[1], payload.sub);
   }
 }

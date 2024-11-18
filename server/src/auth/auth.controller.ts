@@ -47,12 +47,12 @@ export class AuthController {
   }
 
   @Post('logout')
-  async handelLogout(@Body() body: any, @Response() res: ResExpress) {
-    await this.authService.logout(body);
-    // const frontendDomain = this.configService.get<string>('FRONTEND_DOMAIN');
-    // res.cookie('accessToken', null, { httpOnly: true, domain: frontendDomain });
-
-    return res.send({ message: 'Logout Successfully!!!' });
+  @UseGuards(JwtAuthGuard)
+  handelLogout(
+    @CurrentUser() user: User,
+    @Res() res: ResExpress,
+  ) {
+    return this.authService.logout(user.id, res);
   }
 
   @Public()
@@ -64,22 +64,20 @@ export class AuthController {
   @Get('me')
   @CacheKey('get_me')
   @CacheTTL(1)
+  @Roles(Role.USER, Role.ADMIN, Role.WRITER)
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
-  @Roles(Role.USER, Role.ADMIN, Role.WRITER)
-  getMe(@Request() req: any) {
-    const userId = req.user.userId;
-    return this.authService.getMe(userId);
+  getMe(@CurrentUser() user: User) {
+    return this.authService.getMe(user.id);
   }
 
   @Post('refresh')
   @UseGuards(JwtRefreshAuthGuard)
-  async hanleRefreshToken(
+  hanleRefreshToken(
     @CurrentUser() user: User,
     @Res({ passthrough: true }) res: ResExpress,
   ) {
-    // await this.authService.login(user, res);
-    return 'oke';
+    return this.authService.login(user, res);
   }
 
   @Get('mail')

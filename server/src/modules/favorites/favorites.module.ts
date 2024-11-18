@@ -8,6 +8,8 @@ import { ArticlesModule } from '@/modules/articles/articles.module';
 import { Favorite } from '@/modules/favorites/entities/favorite.entity';
 import { FavoritesService } from '@/modules/favorites/favorites.service';
 import { FavoritesController } from '@/modules/favorites/favorites.controller';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from '@/auth/passwort/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -16,6 +18,12 @@ import { FavoritesController } from '@/modules/favorites/favorites.controller';
     ArticlesModule,
   ],
   controllers: [FavoritesController],
-  providers: [FavoritesService, ],
+  providers: [
+    FavoritesService, 
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    ],
 })
 export class FavoritesModule {}

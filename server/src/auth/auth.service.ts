@@ -88,12 +88,12 @@ export class AuthService {
       ),
     );
 
-    // const frontendDomain = this.configService.get<string>('FRONTEND_DOMAIN');
+    const frontendDomain = this.configService.getOrThrow('FRONTEND_DOMAIN');
 
     res.cookie('refresh', refreshToken, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
-      // domain: frontendDomain,
+      domain: frontendDomain,
       expires: expiresRefreshToken,
     });
 
@@ -105,12 +105,19 @@ export class AuthService {
     return await this.sendMail({ email, code });
   }
 
-  async logout(data: any) {
-    // TODO: 
-    // Delete key in redis by userId
-    // Remove in cookie for response.
+  async logout(userId: string, res: Response) {
 
-    console.log(data.userId);
+    await this.redisCacheService.del(`auth:${userId}`);
+
+    const frontendDomain = this.configService.getOrThrow('FRONTEND_DOMAIN');
+
+    res.cookie('refresh', null, {
+      httpOnly: true,
+      secure: this.configService.get('NODE_ENV') === 'production',
+      domain: frontendDomain,
+      expires: new Date(),
+    });
+    return res.status(201).send({ message: "Logout Successfully!!!" });
   }
 
   async verify(verifyAuthDto: VerifyAuthDto): Promise<Object> {
@@ -137,10 +144,34 @@ export class AuthService {
     return { message: 'Account is activated!!!' };
   }
 
-  async refreshToken(token: string, userId: string) {
+  async verifyAccessToken(token: string, userId: string) {
+    if (!token) {
+      throw new UnauthorizedException('Access Token is not valid!!!');
+    }
+
+    const { sub } = await this.jwtService.decode(token);
+
+    const { accessToken, refreshToken } = await this.redisCacheService.get(
+      `auth:${sub}`,
+    );
+
+    if (!accessToken && !refreshToken) {
+      throw new NotFoundException("Your account doesn't exist!!!");
+    }
+
+    const user = await this.userService.findAuthOne(userId);
+
+    if (!user) {
+      throw new NotFoundException("Your account doesn't exist!!!");
+    }
+
+    return user;
+  }
+
+  async verifyRefreshToken(token: string, userId: string) {
     try {
       if (!token) {
-        throw new UnauthorizedException('Access Token is not valid!!!');
+        throw new UnauthorizedException('Refresh Token is not valid!!!');
       }
 
       const user = await this.userService.findAuthOne(userId);

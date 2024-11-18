@@ -94,6 +94,7 @@ export class UsersService {
         'role.id',
         'role.code'
       ])
+      .where('user.id = :userId', { userId: id})
       .getOne();
   }
 
