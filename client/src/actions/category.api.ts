@@ -2,8 +2,8 @@ import {
   CATEGORY_ROUTES,
   GET_ALL_CATEGORY,
   HeaderConfig,
-  requestClient,
 } from "@/actions/api.route";
+import { requestClient } from "@/actions/api.request";
 import { getToken } from "@/lib/utils";
 import { CategoryRequest } from "@/types/category.type";
 

@@ -1,5 +1,6 @@
 import { IS_PUBLIC_KEY } from '@/decorator/auth.decorator';
 import {
+  BadRequestException,
   ExecutionContext,
   Injectable,
   UnauthorizedException,
@@ -24,14 +25,18 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  // handleRequest(err: any, user: any, info: { name: string; mesage: string; stack: any }) {
-  //   if(info?.name === 'TokenExpiredError') {
-  //     throw new UnauthorizedException("Your login is expired!!!");
-  //   }
+  handleRequest(err: any, user: any, info: { name: string; message: string; stack: any }) {
+    // if(info?.name === 'TokenExpiredError') {
+    //   throw new UnauthorizedException("Your login is expired!!!");
+    // }
 
-  //   if (err || !user) {
-  //     throw err || new UnauthorizedException('Access Token is not valid!!!');
-  //   }
-  //   return user;
-  // }
+    if(info?.message.includes("is not valid JSON")) {
+      throw new BadRequestException("Your token have a problem");
+    }
+
+    if (err || !user) {
+      throw err || new UnauthorizedException();
+    }
+    return user;
+  }
 }

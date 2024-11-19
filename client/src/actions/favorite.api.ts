@@ -1,5 +1,6 @@
 import { getToken } from "@/lib/utils";
-import { FAVORITE_ROUTES, HeaderConfig, requestClient } from "./api.route";
+import { FAVORITE_ROUTES, HeaderConfig } from "@/actions/api.route";
+import { requestClient } from "@/actions/api.request";
 
 export const getFavoritesByUserId = async (query?: string): Promise<any> => {
   if (!query) query = "";

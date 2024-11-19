@@ -33,11 +33,11 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async handleLogin(
+  handleLogin(
     @CurrentUser() user: User,
     @Res({ passthrough: true }) res: ResExpress,
   ) {
-    await this.authService.login(user, res);
+    return this.authService.login(user, res);
   }
 
   @Public()
@@ -72,6 +72,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @Public()
   @UseGuards(JwtRefreshAuthGuard)
   hanleRefreshToken(
     @CurrentUser() user: User,

@@ -1,10 +1,10 @@
 import {
   ARTICLE_ROUTES,
   HeaderConfig,
-  requestClient,
 } from "@/actions/api.route";
 import { getToken } from "@/lib/utils";
 import { ArticleRequest } from "@/types/article.type";
+import { requestClient } from "@/actions/api.request";
 
 export const createArticle = async (
   body: ArticleRequest,

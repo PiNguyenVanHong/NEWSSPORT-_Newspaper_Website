@@ -50,7 +50,6 @@ const Header = () => {
         setCurrentUser(userInfo);
       } catch (error) {
         if (error instanceof AxiosError) {
-          console.log(error);
           toast.error(error?.response?.data?.message);
         } else {
           console.log(error);

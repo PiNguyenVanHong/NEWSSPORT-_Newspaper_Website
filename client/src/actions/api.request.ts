@@ -1,65 +1,109 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import { jwtDecode } from "jwt-decode";
-import { REFRESH_TOKEN_ROUTE } from "@/actions/api.route";
+import axios from "axios";
+// import axiosRetry from 'axios-retry';
+import { HOST } from "@/actions/api.route";
 import { getToken } from "@/lib/utils";
+import { refreshToken } from "./auth.api";
 
-export class APIClient {
-  private client: AxiosInstance;
+export const requestClient = axios.create({
+  baseURL: HOST,
+  timeout: 20000,
+  withCredentials: true,
+});
 
-  constructor(baseURL: string, timeout = 20000) {
-    this.client = axios.create({
-      baseURL,
-      timeout,
-      withCredentials: true,
-    });
+// axiosRetry(requestClient, {
+//   retries: 3,
+//   retryCondition: (error) => error.response?.status === 401,
+//   retryDelay: (retryCount, error) => retryCount * 1000,
+// });
 
-    this.initializeRequestInterceptor();
-  }
+// requestClient.interceptors.response.use(
+//   async (response) => {
+//     const { config, data } = response;
+//     if (
+//       config.url?.indexOf("login")! >= 0 ||
+//       config.url?.indexOf("register")! >= 0 ||
+//       config.url?.indexOf("refresh")! >= 0
+//     ) {
+//       return response;
+//     }
 
-  private initializeRequestInterceptor() {
-    this.client.interceptors.request.use(async (config) => {
-      const token = await getToken();
+//     const { code } = data;
+    
+//     console.log(code);
+    
+//     if (code && code == 401) {
+//       // const token = await getToken();
+//       // if (!token) return Promise.reject(data.message);
 
-      if (token) {
-        const { exp }: any = jwtDecode(token);
+//       try {
+//         const { accessToken } = await refreshToken();
 
-        if (Date.now() >= exp * 1000) {
-          try {
-            const { data } = await axios.post(REFRESH_TOKEN_ROUTE);
+//         localStorage.setItem("token", JSON.stringify(accessToken));
+//         config.headers["Authorization"] = `Bearer ${accessToken}`;
+//         console.log('run>>>> ', accessToken);
+        
 
-            localStorage.setItem("accessToken", data.accessToken);
-            config.headers.Authorization = `Bearer ${data.accessToken}`;
-          } catch (error) {
-            console.error("Refresh token expired, logging out...");
-            localStorage.clear();
-            window.location.href = "/sign-in";
-          }
-        } else {
-          config.headers.Authorization = `Bearer ${token}`;
+//         return requestClient(config);
+//       } catch (err) {
+//         console.log(err);
+//         localStorage.clear();
+//         return Promise.reject(err);
+//       }
+//     }
+
+//     return response;
+//   },
+//   (error) => {
+//     console.log("Run o day roi");
+    
+//     return Promise.reject(error);
+//   }
+// );
+
+let isRefreshToken = false;
+let requestsToRefresh: ((token: string | null) => void)[] = [];
+
+requestClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const { response, config } = error;
+    const status = response?.status;
+
+    if (status === 401) {
+      const token = localStorage.getItem("token");
+      if (!token) return Promise.reject(error);
+
+      if (!isRefreshToken) {
+        isRefreshToken = true;
+        try {
+          const { accessToken } = await refreshToken();
+          localStorage.setItem("token", JSON.stringify(accessToken));
+          
+          config.headers["Authorization"] = `Bearer ${accessToken}`;
+          requestClient(config);
+          // requestsToRefresh.forEach((cb) => cb(accessToken));
+        } catch (err) {
+          localStorage.clear();
+          requestsToRefresh.forEach((cb) => cb(null));
+          return Promise.reject(err);
+        } finally {
+          isRefreshToken = false;
+          requestsToRefresh = [];
         }
       }
 
-      return config;
-    });
-  }
+      return new Promise((resolve, reject) => {
+        requestsToRefresh.push((token) => {
+          if (token) {
+            config.headers["Authorization"] = `Bearer ${token}`;
+            resolve(requestClient(config));
+          } else {
+            reject(error);
+          }
+        });
+      });
+    }
 
-  public async get<T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.get<T>(url, config);
+    return Promise.reject(error);
   }
-
-  public async post<T>(url: string, data: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.post<T>(url, data, config);
-  }
-
-  public async put<T>(url: string, data: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.put<T>(url, data, config);
-  }
-
-  public async patch<T>(url: string, data: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.put<T>(url, data, config);
-  }
-
-  public async delete<T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.delete<T>(url, config);
-  }
-}
+);

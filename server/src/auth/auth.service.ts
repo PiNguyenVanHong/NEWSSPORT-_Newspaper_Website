@@ -88,16 +88,16 @@ export class AuthService {
       ),
     );
 
-    const frontendDomain = this.configService.getOrThrow('FRONTEND_DOMAIN');
+    // const frontendDomain = this.configService.getOrThrow('FRONTEND_DOMAIN');
 
     res.cookie('refresh', refreshToken, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
-      domain: frontendDomain,
+      // domain: frontendDomain,
       expires: expiresRefreshToken,
     });
 
-    return res.send({ accessToken });
+    return { accessToken };
   }
 
   async register(createAuthDto: CreateAuthDto): Promise<Object> {
