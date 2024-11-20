@@ -1,6 +1,5 @@
 import { DataSource } from 'typeorm';
 import { Module } from '@nestjs/common';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
@@ -9,13 +8,11 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { AppService } from '@/app.service';
 import { AppController } from '@/app.controller';
 import { AuthModule } from '@/auth/auth.module';
-import { JwtAuthGuard } from '@/auth/passwort/jwt-auth.guard';
 import { UsersModule } from '@/modules/users/users.module';
 import { CategoriesModule } from '@/modules/categories/categories.module';
 import { ArticlesModule } from '@/modules/articles/articles.module';
 import { CodesModule } from '@/modules/codes/codes.module';
 import { RolesModule } from '@/modules/roles/roles.module';
-import { RolesGuard } from '@/modules/roles/guards/roles.guard';
 import { SocialLinksModule } from '@/modules/social-links/social-links.module';
 import { FavoritesModule } from '@/modules/favorites/favorites.module';
 import { RedisCacheModule } from './redis-cache/redis-cache.module';

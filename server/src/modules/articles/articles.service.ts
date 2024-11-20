@@ -490,8 +490,28 @@ export class ArticlesService {
     return { result };
   }
 
-  update(id: number, updateArticleDto: UpdateArticleDto) {
-    return `This action updates a #${id} article`;
+  async update(id: number, updateArticleDto: UpdateArticleDto) {
+    const { title, description, content, link, categoryId } = updateArticleDto;
+
+    await this.isExist(id);
+
+    const category = await this.categoryService.findOne(categoryId);
+
+    if(!category) {
+      throw new NotFoundException("Your category is not exist!!!");
+    }
+
+    await this.articleRepository.update(id, {
+      title,
+      description,
+      content,
+      link,
+      category
+    });
+
+    return {
+      message: 'Update Article Successfully!!!',
+    };
   }
 
   async updateStatus(id: number, status: string) {

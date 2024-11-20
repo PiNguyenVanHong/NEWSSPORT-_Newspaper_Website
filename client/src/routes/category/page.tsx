@@ -17,6 +17,18 @@ function CategoryNewsPage({ category, articles }: CategoryNewsPageProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const setTitle = (title: string) => {
+      const el = document.querySelector("title")!;
+      el.innerText = `${title}`;
+    };
+
+    const setDescription = (desc: string) => {
+      const el = document.querySelector("meta[name='description']")!;
+      el.setAttribute("content", desc);
+    };
+
+   setTitle("Category - News Sport+");
+   setDescription("Category Page");
     animatePageIn();
   }, [category, articles]);
 
@@ -50,9 +62,7 @@ function CategoryNewsPage({ category, articles }: CategoryNewsPageProps) {
                 <div className="h-96">
                   <img src={formatUrlImage(articles[0]?.thumbnail!)} alt="" />
                 </div>
-                <h2 className="text-3xl">
-                  {articles[0]?.title}
-                </h2>
+                <h2 className="text-3xl">{articles[0]?.title}</h2>
                 <div className="text-foreground-gray font-normal line-clamp-4 h-20">
                   {articles[0]?.description}
                 </div>

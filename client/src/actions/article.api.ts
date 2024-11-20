@@ -1,7 +1,4 @@
-import {
-  ARTICLE_ROUTES,
-  HeaderConfig,
-} from "@/actions/api.route";
+import { ARTICLE_ROUTES, HeaderConfig } from "@/actions/api.route";
 import { getToken } from "@/lib/utils";
 import { ArticleRequest } from "@/types/article.type";
 import { requestClient } from "@/actions/api.request";
@@ -63,6 +60,18 @@ export const getArticleById = async (id: string): Promise<any> => {
   return data;
 };
 
+export const getArticleByMe = async (query?: string): Promise<any> => {
+  const token = await getToken();
+  if (!query) query = "";
+
+  const { data } = await requestClient.get(
+    ARTICLE_ROUTES + "/me" + query,
+    HeaderConfig(token)
+  );
+
+  return data;
+};
+
 export const updateStatusArticleById = async (
   id: string,
   status: string
@@ -95,12 +104,15 @@ export const updateTopHeadingArticle = async (
   return data;
 };
 
-export const getArticleByMe = async (query?: string): Promise<any> => {
+export const updateArticle = async (
+  articleId: string,
+  body: ArticleRequest
+) => {
   const token = await getToken();
-  if (!query) query = "";
 
-  const { data } = await requestClient.get(
-    ARTICLE_ROUTES + "/me" + query,
+  const { data } = await requestClient.patch(
+    ARTICLE_ROUTES + "/" + articleId,
+    body,
     HeaderConfig(token)
   );
 

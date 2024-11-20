@@ -49,6 +49,7 @@ function Homepage() {
   const { results }: { results: ArticleResponse[] } = useLoaderData() as any;
 
   useEffect(() => {
+    document.title = "Homepage - News Sport+";
     animatePageIn();
   }, []);
 

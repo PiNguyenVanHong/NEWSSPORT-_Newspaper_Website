@@ -1,17 +1,22 @@
-import { CircleXIcon, PanelLeftClose, PanelLeftOpen, Trash, Trash2 } from "lucide-react";
+import {
+  PanelLeftClose,
+  PanelLeftOpen,
+  Trash2,
+} from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formUpdateArticleSchema } from "@/types/chema.type";
 import { CategoryResponse } from "@/types/category.type";
 import { ArticleRequest } from "@/types/article.type";
 import { ArticleResponse } from "@/types/article.type";
 import { formatUrlImage } from "@/lib/format";
-import { createArticle } from "@/actions/article.api";
+import { updateArticle } from "@/actions/article.api";
+import { AuthContext } from "@/context/auth-context";
 
 import {
   Sidebar,
@@ -43,7 +48,6 @@ import {
 import HeaderAction from "@/components/dashboard/header-action";
 import ContentArticle from "@/components/article/content";
 import { statuses } from "../_components/data";
-import { AuthContext } from "@/context/auth-context";
 
 function DashboardUpdateArticlePage() {
   const {
@@ -63,6 +67,7 @@ function DashboardUpdateArticlePage() {
   const [open, setOpen] = useState<boolean>(true);
   const [content, setContent] = useState(article.content!);
   const editable = userId === article.user?.id;
+  const navigate = useNavigate();
 
   const form = useForm({
     resolver: zodResolver(formUpdateArticleSchema),
@@ -71,13 +76,11 @@ function DashboardUpdateArticlePage() {
       description: article.description!,
       content: article.content!,
       oldThumbnail: article.thumbnail!,
-      thumbnail: undefined,
+      // thumbnail: undefined,
       categoryId: article.category?.id!,
       status: article.status!,
     },
   });
-
-  const fileRef = form.register("thumbnail");
 
   const onChange = (data: string) => {
     setContent(data);
@@ -91,20 +94,18 @@ function DashboardUpdateArticlePage() {
         return;
       }
 
-      //   const body: ArticleRequest = {
-      //     title: values.title,
-      //     content: content,
-      //     description: values.description,
-      //     link: "",
-      //     categoryId: values.categoryId,
-      //   };
-      //   const formData = new FormData();
-      //   formData.append("thumbnail", values.thumbnail[0]);
+      const body: ArticleRequest = {
+        title: values.title,
+        content: content,
+        description: values.description,
+        categoryId: values.categoryId,
+      };
 
-      //   const { message } = await createArticle(body, formData);
-      //   handleClose();
+      const { message } = await updateArticle(article.id!, body);
+      handleClose();
 
-      //   toast.success(message);
+      toast.success(message);
+      navigate("/dashboard/own-articles");
     } catch (error) {
       if (error instanceof AxiosError)
         toast.error(error?.response?.data?.message);
@@ -236,7 +237,6 @@ function DashboardUpdateArticlePage() {
                   <SidebarGroupContent>
                     <SidebarMenu>
                       <SidebarMenuItem>
-                        {/* {form.getValues("thumbnail") ? ( */}
                         <div className="w-full h-48 relative group">
                           <img
                             className="absolute inset-0 z-[1] w-full h-full"
@@ -249,32 +249,16 @@ function DashboardUpdateArticlePage() {
                             </button>
                           </div>
                         </div>
-                        {/* ): ( */}
-                        <FormField
-                          control={form.control}
-                          name="thumbnail"
-                          render={() => (
-                            <FormItem>
-                              <FormControl>
-                                <Input
-                                  {...fileRef}
-                                  type="file"
-                                  placeholder="thumbnail articles...."
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        {/* )} */}
                       </SidebarMenuItem>
                     </SidebarMenu>
                   </SidebarGroupContent>
                 </SidebarGroup>
 
-                <Button className="w-full" disabled={isLoading}>
-                  Update
-                </Button>
+                <div className="w-full px-2">
+                  <Button className="w-full" disabled={isLoading}>
+                    Update
+                  </Button>
+                </div>
               </form>
             </Form>
           </SidebarContent>
@@ -283,8 +267,7 @@ function DashboardUpdateArticlePage() {
           <main className="w-full h-full">
             <div className="h-full flex flex-1 flex-col gap-4 p-4 pt-0">
               <div className="w-full flex items-start justify-between">
-                <div className="">
-                </div>
+                <div className=""></div>
                 <Button variant={"outline"} onClick={() => setOpen(!open)}>
                   {open ? <PanelLeftOpen /> : <PanelLeftClose />}
                 </Button>

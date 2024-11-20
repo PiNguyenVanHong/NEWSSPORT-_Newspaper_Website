@@ -139,7 +139,7 @@ const Header = () => {
         <div className="flex items-center gap-2">
           <div>Call us (+84) 123 456 789</div>
           <Slash className="-rotate-12" strokeWidth={4} size={10} />
-          <div>hello@newsfactory.com</div>
+          <div>pikayqi@newsfactory.com</div>
         </div>
       </div>
       <div className="border-t-2 border-b-2 border-foreground flex items-center gap-3 mt-4">

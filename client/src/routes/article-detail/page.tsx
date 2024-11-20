@@ -76,13 +76,14 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
 
   useEffect(() => {
     if (!alias.includes(".html")) navigate("/404");
-
+    
     if (
       location.pathname.replace("/", "") !==
       generateSlug(article.title, article.id!)
     )
-      navigate("/404");
-
+    navigate("/404");
+    
+    document.title = "Article Page - News Sport+";
     animatePageIn();
     divRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [alias, article]);
