@@ -1,16 +1,214 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Message</title>
-</head>
-<body>
-    <p>Hello {{firstName}} {{lastName}}</p>
-    <p>We just received your application and we are pleased to inform you that you are invited to the next stage of interview</p>
-    <p>Your interviewer is {{code}}</p>
-    <p>Best regards,</p>
-    <p>Sheggs Company</p>
-</body>
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Verification Code</title>
+    <style>
+      @media only screen and (max-width: 600px) { .container { width: 100%
+      !important; padding: 20px !important; } .header { flex-direction: column
+      !important; text-align: center !important; } .nav { margin-top: 15px
+      !important; } }
+    </style>
+  </head>
+  <body
+    style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f9f9f9; color: #333;"
+  >
+    <table
+      role='presentation'
+      cellspacing='0'
+      cellpadding='0'
+      border='0'
+      align='center'
+      width='100%'
+      style='max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px; border-radius: 8px; margin-top: 40px; margin-bottom: 40px;
+border: 1px solid #FEFEFE; border-top: 8px solid #FF4F1A';
+    >
+      <tr>
+        <td>
+          <!-- Header -->
+          <table
+            role='presentation'
+            width='100%'
+            cellspacing='0'
+            cellpadding='0'
+            border='0'
+          >
+            <tr>
+              <td style='padding-bottom: 40px;'>
+                <table
+                  role='presentation'
+                  width='100%'
+                  cellspacing='0'
+                  cellpadding='0'
+                  border='0'
+                >
+                  <tr>
+                    <td>
+                      <img
+                        src='https://utfs.io/f/6h2bwx305Lq7LzSTms6OJNdagX652FuzUEyhZrGc90WKMSYw'
+                        alt='Logo'
+                        style='height: 30px;'
+                      />
+                    </td>
+                    <td style='text-align: right;'>
+                      <a
+                        href=`{{homeUrl}}`
+                        style='color: #333; text-decoration: none; margin-left: 20px;'
+                      >Home</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Content -->
+          <table
+            role='presentation'
+            width='100%'
+            cellspacing='0'
+            cellpadding='0'
+            border='0'
+          >
+            <tr>
+              <td style='padding-bottom: 20px;'>
+                <p style='margin: 0; font-size: 16px; font-weight: 500;'>Hi {{firstName}} {{lastName}},</p>
+              </td>
+            </tr>
+            <tr>
+              <td style='padding-bottom: 20px;'>
+                <p style='margin: 0; font-size: 16px;'>This is your one time
+                  verification code.</p>
+              </td>
+            </tr>
+            <tr>
+              <td
+                style='padding: 30px 0; text-align: center; background-color: #FFF5F2; border-radius: 4px;'
+              >
+                <p
+                  style='margin: 0; font-size: 32px; letter-spacing: 8px; font-weight: 500;'
+                >{{code}}</p>
+              </td>
+            </tr>
+            <tr>
+              <td style='padding-top: 20px;'>
+                <p style='margin: 0; font-size: 14px; color: #666;'>This code is
+                  only active for the next {{expiredCode}}. Once the code expires you
+                  will have to resubmit a request for a code.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style='padding-top: 40px;'>
+                <p style='margin: 0; font-size: 16px;'>Keep making awesome
+                  stuff!</p>
+                <p style='margin: 5px 0 0; font-size: 16px;'>News Factory</p>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Footer -->
+          <table
+            role='presentation'
+            width='100%'
+            cellspacing='0'
+            cellpadding='0'
+            border='0'
+          >
+            <tr>
+              <td style='padding-top: 40px; text-align: center;'>
+                <img
+                  src='https://utfs.io/f/6h2bwx305Lq7LzSTms6OJNdagX652FuzUEyhZrGc90WKMSYw'
+                  alt='Logo'
+                  style='height: 30px;'
+                />
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <!-- Footer -->
+    <table
+      role='presentation'
+      cellspacing='0'
+      cellpadding='0'
+      border='0'
+      width='100%'
+      style='margin-top: 32px;'
+    >
+      <!-- Social Links -->
+      <tr>
+        <td style='padding-bottom: 24px; text-align: center;'>
+          <a href='#' style='text-decoration: none; margin: 0 8px;'>
+            <img
+              src='https://utfs.io/f/6h2bwx305Lq7P3tHxJA8R316STNr5ZMyEDCbPleAgvWf70HO'
+              alt='Twitter'
+              style='width: auto; height: 24px; 	object-fit: contain; position: relative; top: -2px;'
+            />
+          </a>
+          <a href='#' style='text-decoration: none; margin: 0 8px;'>
+            <img
+              src='https://utfs.io/f/6h2bwx305Lq7LZZeqEh6OJNdagX652FuzUEyhZrGc90WKMSY'
+              alt='Facebook'
+              style='width: auto; height: 28px; 	object-fit: contain; position: relative; top: -1px;'
+            />
+          </a>
+          <a href='#' style='text-decoration: none; margin: 0 8px;'>
+            <img
+              src='https://utfs.io/f/6h2bwx305Lq7Eh6NLzyr6tSOcafQJ1CbIFso0UeE3jBGm2XP'
+              alt='Instagram'
+              style='width: auto; height: 28px; 	object-fit: contain; position: relative; top: 0px;'
+            />
+          </a>
+          <a href='#' style='text-decoration: none; margin: 0 8px;'>
+            <img
+              src='https://utfs.io/f/6h2bwx305Lq74HQghLKyUA3B7uCrlXo5whKdpPF9YkJHTLsQ'
+              alt='LinkedIn'
+              style='width: auto; height: 30px; 	object-fit: contain; position: relative; top: 0.5px;'
+            />
+          </a>
+        </td>
+      </tr>
+
+      <!-- Company Info -->
+      <tr>
+        <td style='text-align: center; padding-bottom: 16px;'>
+          <p
+            style='margin: 0; font-size: 12px; line-height: 16px; color: #6B7280;'
+          >
+            ©
+            {{currentYear}}
+            {{companyName}}. All Rights Reserved.<br />
+            101 King St, San Francisco, CA 94107
+          </p>
+        </td>
+      </tr>
+
+      <!-- Legal Links -->
+      <tr>
+        <td style='text-align: center;'>
+          <p
+            style='margin: 0; font-size: 12px; line-height: 16px; color: #6B7280;'
+          >
+            You are being contacted because you signed up for
+            {{companyName}}.<br />
+            <a
+              href='{{unsubscribeUrl}}'
+              style='color: #0066FF; text-decoration: underline; font-weight: 600;'
+            >Unsubscribe</a>
+            	&nbsp;|	&nbsp;
+            <a
+              href='{{privacyUrl}}'
+              style='color: #0066FF; text-decoration: underline; font-weight: 600;'
+            >Privacy Policy</a>
+            	&nbsp;|	&nbsp;
+            <a
+              href='{{supportUrl}}'
+              style='color: #0066FF; text-decoration: underline; font-weight: 600;'
+            >Support</a>
+          </p>
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>

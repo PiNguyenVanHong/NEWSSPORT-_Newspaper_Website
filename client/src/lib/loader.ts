@@ -10,6 +10,7 @@ import {
   getArticleByMe,
 } from "@/actions/article.api";
 import { getFavoritesByUserId } from "@/actions/favorite.api";
+import { getUserProfileById } from "@/actions/user.api";
 
 export const homepageLoader = async () => {
   try {
@@ -205,4 +206,15 @@ export const topHeadingDashboardPageLoader = async () => {
     console.log(error);
     return { meta: null, articles: []};
   }
+};
+
+export const editUserProfilePageLoader = async () => {
+try {
+  const { result } = await getUserProfileById();
+
+  return { userInfo: result };
+} catch (error) {
+  console.log(error);
+  return null;
+}
 };

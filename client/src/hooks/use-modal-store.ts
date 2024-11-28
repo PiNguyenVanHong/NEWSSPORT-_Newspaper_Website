@@ -1,10 +1,11 @@
 import { create } from "zustand";
 
-export type ModalType = "login-form" | "update-status-article" | "update-top-heading-article" | "" ;
+export type ModalType = "login-form" | "update-status-article" | "update-top-heading-article" | "resend-mail" | "add-social-link" | "" ;
 
 interface ModalData{
     apiUrl?: string;
     query?: Record<string, any>;
+    redirectAction?: () => void;
 }
 
 interface ModalStore {

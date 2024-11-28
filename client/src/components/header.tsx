@@ -46,7 +46,7 @@ const Header = () => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const userInfo = await getMe(token);
+        const userInfo = await getMe();
         setCurrentUser(userInfo);
       } catch (error) {
         if (error instanceof AxiosError) {
@@ -108,7 +108,7 @@ const Header = () => {
       logoutClient();
       toast.success(message);
 
-      navigate("/");
+      navigate("/sign-in");
     } catch (error) {
       console.log(error);
       toast.error("Something went wrong!!!");
@@ -166,7 +166,7 @@ const Header = () => {
           <div className="max-w-80 flex items-center gap-4">
             {currentUser ? (
               <>
-                <button className="py-2 px-6 bg-foreground text-white uppercase">
+                <button className="py-2 px-6 bg-foreground text-white uppercase truncate">
                   subscribe for more
                 </button>
                 <DropdownMenu>

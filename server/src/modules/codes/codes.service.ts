@@ -21,13 +21,17 @@ export class CodesService {
   }
 
   async create(createCodeDto: CreateCodeDto) {
-    if(await this.isExist(createCodeDto.email)) {
-      const existCode = await this.codeRepository.findOneBy({ email: createCodeDto.email });
+    if (await this.isExist(createCodeDto.email)) {
+      const existCode = await this.codeRepository.findOneBy({
+        email: createCodeDto.email,
+      });
 
-      if(existCode.expires < new Date() ) {
+      if (existCode.expires < new Date()) {
         this.codeRepository.delete({ email: createCodeDto.email });
       } else {
-        throw new BadRequestException("Your code just sent, please check your email!!!");
+        throw new BadRequestException(
+          'Your code just sent, please check your email!!!',
+        );
       }
     }
 
@@ -39,10 +43,23 @@ export class CodesService {
     const isExist = await this.codeRepository.exists({ where: { email } });
 
     return isExist;
-  };
+  }
 
   async findOneByEmail(email: string) {
     return await this.codeRepository.findOneBy({ email });
+  }
+
+  async expiredCodeCountDown(email: string) {
+    const code = await this.findOneByEmail(email);
+
+    if (!code) {
+      return 0;
+    }
+
+    return Math.max(
+      Math.floor((code.expires.getTime() - new Date().getTime()) / 1000),
+      0,
+    );
   }
 
   findAll() {
@@ -60,5 +77,16 @@ export class CodesService {
   async remove(id: string) {
     await this.codeRepository.delete(id);
     return `Delete code successfully`;
+  }
+
+  async removeByEmail(email: string) {
+    const code = await this.codeRepository.findOne({
+      where: { email },
+      select: ["id"]
+    });
+
+    if(code) {
+      await this.codeRepository.delete(code.id);
+    }
   }
 }

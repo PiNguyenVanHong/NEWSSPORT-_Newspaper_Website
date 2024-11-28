@@ -2,15 +2,12 @@ import {
   Controller,
   Post,
   UseGuards,
-  Request,
   Get,
   Body,
-  Response,
   Res,
-  Req,
+  Query,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Request as ReqExpress, Response as ResExpress } from 'express';
+import { Response as ResExpress } from 'express';
 import { Public } from '@/decorator/auth.decorator';
 import { Roles } from '@/decorator/roles.decorator';
 import { Role } from '@/modules/roles/role.enum';
@@ -18,12 +15,12 @@ import { Role } from '@/modules/roles/role.enum';
 import { AuthService } from '@/auth/auth.service';
 import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { LocalAuthGuard } from '@/auth/passwort/local-auth.guard';
-import { VerifyAuthDto } from '@/auth/dto/verify-auth.dto';
+import { ResendMailAuthDto, VerifyAuthDto } from '@/auth/dto/verify-auth.dto';
 import { CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { CurrentUser } from '@/decorator/current-user.decorator';
 import { User } from '@/modules/users/entities/user.entity';
-import { JwtRefreshAuthGuard } from './passwort/jwt-refresh.guard';
-import { JwtAuthGuard } from './passwort/jwt-auth.guard';
+import { JwtRefreshAuthGuard } from '@/auth/passwort/jwt-refresh.guard';
+import { JwtAuthGuard } from '@/auth/passwort/jwt-auth.guard';
 import { RolesGuard } from '@/modules/roles/guards/roles.guard';
 
 @Controller('auth')
@@ -59,6 +56,18 @@ export class AuthController {
   @Post('verify')
   handleVerify(@Body() body: VerifyAuthDto) {
     return this.authService.verify(body);
+  }
+
+  @Public()
+  @Get('resend-mail')
+  handleCheckResendMail(@Query('email') email: string) {
+    return this.authService.checkResendMail(email);
+  }
+
+  @Public()
+  @Post('resend-mail')
+  handleResendMail(@Body() body: ResendMailAuthDto) {
+    return this.authService.resendMail(body);
   }
 
   @Get('me')

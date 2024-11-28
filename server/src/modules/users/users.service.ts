@@ -1,12 +1,11 @@
 import aqp from 'api-query-params';
 import { Repository } from 'typeorm';
-import { Cache } from 'cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { CreateUserDto } from '@/modules/users/dto/create-user.dto';
 import { UpdateUserDto } from '@/modules/users/dto/update-user.dto';
+import { UpdateUserProfileDto } from '@/modules/users/dto/update-user-profile-dto';
 import { User } from '@/modules/users/entities/user.entity';
 import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { CodesService } from '@/modules/codes/codes.service';
@@ -80,6 +79,24 @@ export class UsersService {
     });
   }
 
+  async findOneUserProfile(id: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.role', 'role')
+      .select([
+        'user.email',
+        'user.phone',
+        'user.firstName',
+        'user.lastName',
+        'user.bio',
+        'user.isTwoFactorEnabled',
+      ])
+      .where('user.id = :userId', { userId: id })
+      .getOne();
+
+    return { result: user };
+  }
+
   async findOne(id: string) {
     return await this.userRepository.findOneBy({ id });
   }
@@ -113,6 +130,20 @@ export class UsersService {
     return await this.userRepository.update(updateUserDto.id, {
       ...updateUserDto,
     });
+  }
+
+  async updateUserProfile(userId: string, updateUserProfileDto: UpdateUserProfileDto) {
+
+    await this.userRepository.update(
+      userId,
+      {
+        ...updateUserProfileDto
+      }
+    );
+
+    return {
+      message: "Update User Profile Successfully",
+    };
   }
 
   async updateIsActiveByEmail(email: string, isActive: boolean) {

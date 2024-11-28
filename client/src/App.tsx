@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import {
   articleDashboardPageLoader,
   categoryDashboardPageLoader,
+  editUserProfilePageLoader,
   favoritesPageLoader,
   homepageLoader,
   ownArticleDashboardPageLoader,
@@ -29,6 +30,7 @@ import DashboardCreateArticlePage from "@/routes/dashboard/article/create/page";
 import DashboardUpdateArticlePage from "@/routes/dashboard/article/update/page";
 import DashboardOwnArticlePage from "@/routes/dashboard/own-article/page";
 import DashboardTopHeadingPage from "@/routes/dashboard/top-heading/page";
+import DashboardEditUserProfilePage from "@/routes/dashboard/me/page";
 
 import LayoutPage from "@/components/layout/layout";
 import AuthLayoutPage from "@/components/layout/auth-layout";
@@ -119,6 +121,11 @@ function App() {
           path: "/dashboard/own-articles/update",
           element: <DashboardUpdateArticlePage />,
           loader: updateArticleDashboardPageLoader,
+        },
+        {
+          path: "/dashboard/me",
+          element: <DashboardEditUserProfilePage />,
+          loader: editUserProfilePageLoader,
         },
         {
           path: "/dashboard/test-table",

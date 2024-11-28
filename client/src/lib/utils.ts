@@ -26,6 +26,16 @@ export const getIdFromSlug = (pathname: string) => {
   return str[str.length - 1].replace("ar", "");
 };
 
+export const setTitle = (title: string) => {
+  const el = document.querySelector("title")!;
+  el.innerText = `${title}`;
+};
+
+export const setDescription = (desc: string) => {
+  const el = document.querySelector("meta[name='description']")!;
+  el.setAttribute("content", desc);
+};
+
 
 export interface QueryObject {
   filter?: {

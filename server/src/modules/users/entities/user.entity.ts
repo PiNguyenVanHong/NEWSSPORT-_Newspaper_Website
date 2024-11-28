@@ -36,6 +36,12 @@ export class User {
   @Column({ nullable: true })
   lastName: string;
 
+  @Column({ nullable: true })
+  phone: string;
+
+  @Column({ nullable: true })
+  bio: string;
+
   @Column({ default: false })
   isActive: boolean;
 

@@ -6,7 +6,6 @@ import {
   Bell,
   ChevronRight,
   ChevronsUpDown,
-  CreditCard,
   Folder,
   LogOut,
   MoreHorizontal,
@@ -23,7 +22,9 @@ import {
   Settings2,
   SquareTerminal,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "@/context/auth-context";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -56,159 +57,170 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { useContext } from "react";
-import { AuthContext } from "@/context/auth-context";
-
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: UserImage,
-  },
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Top Heading",
-          url: "/dashboard/top-heading",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Category",
-      url: "/dashboard/categories",
-      icon: Bot,
-      items: [
-        {
-          title: "Create Category",
-          url: "/dashboard/categories/create",
-        },
-      ],
-    },
-    {
-      title: "Approved Article",
-      url: "/dashboard/articles",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Create Article",
-          url: "/dashboard/articles/create",
-        },
-        {
-          title: "Update Article",
-          url: "/dashboard/articles/update",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Own Article",
-      url: "/dashboard/own-articles",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Create Article",
-          url: "/dashboard/own-articles/create",
-        },
-        {
-          title: "Update Article",
-          url: "/dashboard/own-articles/update",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navThird: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
-};
+import { getMe } from "@/actions/auth.api";
+import { UserResponse } from "@/types/user.type";
 
 const SidebarDashboard = () => {
   const { role } = useContext(AuthContext) as any;
+  const navigate = useNavigate();
+  const [user, setUser] = useState<UserResponse>();
+
+  useEffect(() => {
+    const getUserProfile = async () => {
+      const result: UserResponse = await getMe();
+      setUser(result);
+    };
+
+    getUserProfile();
+  }, []);
+
+  const data = {
+    user: {
+      name: user?.firstName! + " " + user?.lastName!,
+      email: user?.email ?? "m@example.com",
+      avatar: UserImage,
+    },
+    navMain: [
+      {
+        title: "Dashboard",
+        url: "/dashboard",
+        icon: SquareTerminal,
+        isActive: true,
+        items: [
+          {
+            title: "History",
+            url: "#",
+          },
+          {
+            title: "Top Heading",
+            url: "/dashboard/top-heading",
+          },
+          {
+            title: "Settings",
+            url: "#",
+          },
+        ],
+      },
+      {
+        title: "Category",
+        url: "/dashboard/categories",
+        icon: Bot,
+        items: [
+          {
+            title: "Create Category",
+            url: "/dashboard/categories/create",
+          },
+        ],
+      },
+      {
+        title: "Approved Article",
+        url: "/dashboard/articles",
+        icon: BookOpen,
+        items: [
+          {
+            title: "Create Article",
+            url: "/dashboard/articles/create",
+          },
+          {
+            title: "Update Article",
+            url: "/dashboard/articles/update",
+          },
+        ],
+      },
+      {
+        title: "Settings",
+        url: "#",
+        icon: Settings2,
+        items: [
+          {
+            title: "General",
+            url: "#",
+          },
+          {
+            title: "Team",
+            url: "#",
+          },
+          {
+            title: "Billing",
+            url: "#",
+          },
+          {
+            title: "Limits",
+            url: "#",
+          },
+        ],
+      },
+    ],
+    navSecondary: [
+      {
+        title: "Own Article",
+        url: "/dashboard/own-articles",
+        icon: BookOpen,
+        items: [
+          {
+            title: "Create Article",
+            url: "/dashboard/own-articles/create",
+          },
+          {
+            title: "Update Article",
+            url: "/dashboard/own-articles/update",
+          },
+        ],
+      },
+      {
+        title: "Settings",
+        url: "#",
+        icon: Settings2,
+        items: [
+          {
+            title: "General",
+            url: "#",
+          },
+          {
+            title: "Team",
+            url: "#",
+          },
+          {
+            title: "Billing",
+            url: "#",
+          },
+          {
+            title: "Limits",
+            url: "#",
+          },
+        ],
+      },
+    ],
+    navThird: [
+      {
+        title: "Support",
+        url: "#",
+        icon: LifeBuoy,
+      },
+      {
+        title: "Feedback",
+        url: "#",
+        icon: Send,
+      },
+    ],
+    projects: [
+      {
+        name: "Design Engineering",
+        url: "#",
+        icon: Frame,
+      },
+      {
+        name: "Sales & Marketing",
+        url: "#",
+        icon: PieChart,
+      },
+      {
+        name: "Travel",
+        url: "#",
+        icon: Map,
+      },
+    ],
+  };
 
   return (
     <Sidebar variant="inset">
@@ -235,41 +247,46 @@ const SidebarDashboard = () => {
         <SidebarGroup>
           <SidebarGroupLabel>Admin/Moderator</SidebarGroupLabel>
           <SidebarMenu className="custom-scrollbar">
-            {role === "ADMIN" && data.navMain.map((item) => (
-              <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip={item.title}>
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                  {item.items?.length ? (
-                    <>
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuAction className="data-[state=open]:rotate-90">
-                          <ChevronRight />
-                          <span className="sr-only">Toggle</span>
-                        </SidebarMenuAction>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
-                          {item.items?.map((subItem) => (
-                            <SidebarMenuSubItem key={subItem.title}>
-                              <SidebarMenuSubButton asChild>
-                                <Link to={subItem.url}>
-                                  <span>{subItem.title}</span>
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </>
-                  ) : null}
-                </SidebarMenuItem>
-              </Collapsible>
-            ))}
+            {role === "ADMIN" &&
+              data.navMain.map((item) => (
+                <Collapsible
+                  key={item.title}
+                  asChild
+                  defaultOpen={item.isActive}
+                >
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild tooltip={item.title}>
+                      <Link to={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                    {item.items?.length ? (
+                      <>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuAction className="data-[state=open]:rotate-90">
+                            <ChevronRight />
+                            <span className="sr-only">Toggle</span>
+                          </SidebarMenuAction>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub>
+                            {item.items?.map((subItem) => (
+                              <SidebarMenuSubItem key={subItem.title}>
+                                <SidebarMenuSubButton asChild>
+                                  <Link to={subItem.url}>
+                                    <span>{subItem.title}</span>
+                                  </Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            ))}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </>
+                    ) : null}
+                  </SidebarMenuItem>
+                </Collapsible>
+              ))}
           </SidebarMenu>
         </SidebarGroup>
         <SidebarGroup>
@@ -388,10 +405,10 @@ const SidebarDashboard = () => {
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage src={data.user.avatar} alt={data.user.name} />
-                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                    <AvatarFallback className="rounded-lg">PK</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
+                    <span className="truncate font-semibold capitalize">
                       {data.user.name}
                     </span>
                     <span className="truncate text-xs">{data.user.email}</span>
@@ -412,10 +429,10 @@ const SidebarDashboard = () => {
                         src={data.user.avatar}
                         alt={data.user.name}
                       />
-                      <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                      <AvatarFallback className="rounded-lg">PK</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">
+                      <span className="truncate font-semibold capitalize">
                         {data.user.name}
                       </span>
                       <span className="truncate text-xs">
@@ -433,13 +450,9 @@ const SidebarDashboard = () => {
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/dashboard/me")}>
                     <BadgeCheck />
                     Account
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <CreditCard />
-                    Billing
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Bell />

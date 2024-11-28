@@ -83,3 +83,7 @@ export const formUpdateArticleSchema = z.object({
   //     }
   //   }),
 });
+
+export const formResendMailSchema = z.object({
+  email: z.string().email("Invalid email address").min(1, "Please fill email address")
+});

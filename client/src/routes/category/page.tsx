@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { formatDatePublish, formatUrlImage } from "@/lib/format";
 import { animatePageIn } from "@/lib/animations";
-import { cn, generateSlug } from "@/lib/utils";
+import { cn, generateSlug, setDescription, setTitle } from "@/lib/utils";
 import { CategoryResponse } from "@/types/category.type";
 import { ArticleResponse } from "@/types/article.type";
 
@@ -17,16 +17,6 @@ function CategoryNewsPage({ category, articles }: CategoryNewsPageProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const setTitle = (title: string) => {
-      const el = document.querySelector("title")!;
-      el.innerText = `${title}`;
-    };
-
-    const setDescription = (desc: string) => {
-      const el = document.querySelector("meta[name='description']")!;
-      el.setAttribute("content", desc);
-    };
-
    setTitle("Category - News Sport+");
    setDescription("Category Page");
     animatePageIn();

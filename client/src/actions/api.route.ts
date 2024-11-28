@@ -17,7 +17,7 @@ export const HOST = import.meta.env.VITE_PUBLIC_BACKEND_URL;
 // export const CREATE_CATEGORY = `${CATEGORY_ROUTES}`;
 
 const AUTH_ROUTES = `/api/auth`;
-// const USER_ROUTES = `/api/users`;
+export const USER_ROUTES = `/api/users`;
 export const CATEGORY_ROUTES = `/api/categories`;
 export const ARTICLE_ROUTES = `/api/articles`;
 export const FAVORITE_ROUTES = `/api/favorites`;
@@ -28,6 +28,7 @@ export const LOG_OUT_ROUTE = `${AUTH_ROUTES}/logout`;
 export const VERIFY_REGISTER_ROUTE = `${AUTH_ROUTES}/verify`;
 export const GET_ME_ROUTE = `${AUTH_ROUTES}/me`;
 export const REFRESH_TOKEN_ROUTE = `${AUTH_ROUTES}/refresh`;
+export const RESEND_MAIL_ROUTE = `${AUTH_ROUTES}/resend-mail`;
 
 export const GET_ALL_CATEGORY = `${CATEGORY_ROUTES}`;
 export const CREATE_CATEGORY = `${CATEGORY_ROUTES}`;

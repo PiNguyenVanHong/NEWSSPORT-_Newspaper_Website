@@ -26,8 +26,8 @@ const socials = [
   { id: 1, name: "Facebook", link: "/" },
   { id: 2, name: "Twitter", link: "/" },
   { id: 3, name: "Instagram", link: "/" },
-  { id: 4, name: "Pinterest", link: "/" },
-  { id: 5, name: "Linkedin", link: "/" },
+  { id: 4, name: "Dribbble", link: "/" },
+  { id: 5, name: "LinkedIn", link: "/" },
   { id: 6, name: "Youtube", link: "/" },
 ];
 

@@ -21,9 +21,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AxiosError } from "axios";
+import { useModal } from "@/hooks/use-modal-store";
 
 function SignInPage() {
   const { updateToken }: any = useContext(AuthContext);
+  const { onOpen } = useModal();
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
@@ -47,10 +49,16 @@ function SignInPage() {
   
       toast.success("Login Successfully.");
     } catch (error) {
-      if(error instanceof AxiosError)
+      if(error instanceof AxiosError) {
+        if(error.response?.data.message.includes("is not activated")) {
+          onOpen("resend-mail", { query: { email: values.email }, redirectAction: () => navigate("/verify", { state: { email: values.email } }) });
+        }
         toast.error(error?.response?.data?.message);
-      else 
+      }
+      else {
         console.log(error);
+        toast.error("Something went wrong!!!");
+      }
     }
   };
 
@@ -72,7 +80,7 @@ function SignInPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input {...field} type="email" placeholder="Email" />
+                      <Input className="bg-white" {...field} type="email" placeholder="Email" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -86,7 +94,7 @@ function SignInPage() {
                     <FormControl>
                       <div className="relative">
                         <Input
-                          className="pr-10"
+                          className="pr-10 bg-white"
                           {...field}
                           type={showPassword ? "text" : "password"}
                           placeholder="Password"

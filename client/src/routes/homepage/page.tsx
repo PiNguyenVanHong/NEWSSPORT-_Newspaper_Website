@@ -1,14 +1,14 @@
 import Image from "@/assets/news/1.jpg";
 
-import { useEffect } from "react";
 import { ArrowRight, Mail } from "lucide-react";
+import { useEffect } from "react";
+import { useLoaderData, useNavigate } from "react-router-dom";
+import { ArticleResponse } from "@/types/article.type";
 import { cn, generateSlug } from "@/lib/utils";
-import { formatDatePublish, formatUrlImage } from "@/lib/format";
 import { animatePageIn } from "@/lib/animations";
+import { formatDatePublish, formatUrlImage } from "@/lib/format";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArticleResponse } from "@/types/article.type";
-import { useLoaderData, useNavigate } from "react-router-dom";
 
 const keywords = [
   {
