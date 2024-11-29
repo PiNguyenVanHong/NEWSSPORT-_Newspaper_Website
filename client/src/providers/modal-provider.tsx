@@ -4,6 +4,7 @@ import UpdateTopHeadingArticleModal from "@/components/modals/update-top-heading
 import ResendMailModal from "@/components/modals/resend-email-modal";
 import LoginModal from "@/components/modals/login-modal";
 import AddSocialLinkModal from "@/components/modals/add-social-link-modal";
+import RemoveSocialLinkModal from "@/components/modals/remove-social-link-modal";
 
 export const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -23,6 +24,7 @@ export const ModalProvider = () => {
       <UpdateTopHeadingArticleModal />
       <ResendMailModal />
       <AddSocialLinkModal />
+      <RemoveSocialLinkModal />
     </>
   );
 };

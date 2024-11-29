@@ -22,15 +22,6 @@ import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { AuthContext } from "@/context/auth-context";
 
-const socials = [
-  { id: 1, name: "Facebook", link: "/" },
-  { id: 2, name: "Twitter", link: "/" },
-  { id: 3, name: "Instagram", link: "/" },
-  { id: 4, name: "Dribbble", link: "/" },
-  { id: 5, name: "LinkedIn", link: "/" },
-  { id: 6, name: "Youtube", link: "/" },
-];
-
 const topics = [
   { label: "Allen-f-staley", link: "/" },
   { label: "featured", link: "/" },
@@ -51,6 +42,14 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
   const { userId }: any = useContext(AuthContext);
 
   const [isFavorite, setIsFavorite] = useState(false);
+  const [socials, setSocials] = useState([
+    { id: 1, name: "Facebook", link: "/" },
+    { id: 2, name: "Twitter", link: "/" },
+    { id: 3, name: "Instagram", link: "/" },
+    { id: 4, name: "Dribbble", link: "/" },
+    { id: 5, name: "LinkedIn", link: "/" },
+    { id: 6, name: "Youtube", link: "/" },
+  ]);
   const divRef = useRef<HTMLDivElement>(null);
 
   const breadcrumbs = [
@@ -76,13 +75,28 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
 
   useEffect(() => {
     if (!alias.includes(".html")) navigate("/404");
-    
+
     if (
       location.pathname.replace("/", "") !==
       generateSlug(article.title, article.id!)
     )
-    navigate("/404");
-    
+      navigate("/404");
+
+    const userSocialLinks = article.user?.socialLinks || [];
+
+    const updatedSocials = socials.map((social) => {
+      const matchedLink = userSocialLinks.find((dbLink) =>
+        social.name.toLowerCase().includes(dbLink.name.toLowerCase())
+      );
+
+      return {
+        ...social,
+        link: matchedLink ? matchedLink.link : "",
+      };
+    });
+
+    setSocials(updatedSocials);
+
     document.title = "Article Page - News Sport+";
     animatePageIn();
     divRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -122,6 +136,12 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
         },
       });
     }
+  };
+
+  const handleOpenTab = (url: string) => {
+    if (url.trim().length <= 0) return;
+
+    window.open(url, "_blank");
   };
 
   return (
@@ -191,9 +211,17 @@ function ArticleDetailPage({ alias, article }: ArticleDetailPageProps) {
             <div className="col-span-1 border border-foreground-gray flex items-center justify-center">
               <div className="grid grid-cols-3 items-center gap-y-4 gap-x-10 font-medium">
                 {socials.map((item, index) => (
-                  <Link key={index} to={item.link} className="hover:underline">
+                  <span
+                    key={index}
+                    className={cn(
+                      item.link.trim().length <= 0
+                        ? "text-neutral-500 cursor-not-allowed"
+                        : "hover:underline cursor-pointer"
+                    )}
+                    onClick={() => handleOpenTab(item.link)}
+                  >
                     {item.name}
-                  </Link>
+                  </span>
                 ))}
               </div>
             </div>

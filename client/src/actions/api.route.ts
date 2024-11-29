@@ -21,6 +21,7 @@ export const USER_ROUTES = `/api/users`;
 export const CATEGORY_ROUTES = `/api/categories`;
 export const ARTICLE_ROUTES = `/api/articles`;
 export const FAVORITE_ROUTES = `/api/favorites`;
+export const SOCIAL_LINK_ROUTES = `/api/social-links`;
 
 export const LOGIN_ROUTE = `${AUTH_ROUTES}/login`;
 export const REGISTER_ROUTE = `${AUTH_ROUTES}/register`;

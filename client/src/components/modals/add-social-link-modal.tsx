@@ -3,10 +3,9 @@ import { toast } from "sonner";
 import { RefreshCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { formResendMailSchema } from "@/types/chema.type";
+import { formSocialLinkSchema } from "@/types/chema.type";
 import { useModal } from "@/hooks/use-modal-store";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { resendMail } from "@/actions/auth.api";
 
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -20,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/modals/modal";
+import { addSocialLink } from "@/actions/social-link.api";
 
 const AddSocialLinkModal = () => {
   const [isPending, setIsPending] = useState(false);
@@ -32,40 +32,34 @@ const AddSocialLinkModal = () => {
   const isModalOpen = isOpen && type === "add-social-link";
 
   const form = useForm({
-    resolver: zodResolver(formResendMailSchema),
+    resolver: zodResolver(formSocialLinkSchema),
     defaultValues: {
-      email: "",
       name: query?.name ?? "",
+      url: "",
     },
   });
 
   useEffect(() => {
     if (isModalOpen && query?.name) {
       form.reset({ name: query.name });
-      
     }
-    console.log(query?.name);
+    
   }, [isModalOpen, query?.name]);
 
-  const onSubmit = async (values: z.infer<typeof formResendMailSchema>) => {
-    console.log(values);
+  const onSubmit = async (values: z.infer<typeof formSocialLinkSchema>) => {
+    try {
+      setIsPending(true);
+      const { message } = await addSocialLink(values);
 
-    // try {
-    //   setIsPending(true);
-
-    //   const { email } = values;
-    //   await resendMail(email);
-
-    //   handleClose();
-    //   window.location.reload();
-
-    //   toast.success("Please check your email again!!!");
-    // } catch (error) {
-    //   console.error(error);
-    //   toast.error("Something went wrong!!!");
-    // } finally {
-    //   setIsPending(false);
-    // }
+      handleClose();
+      window.location.reload();
+      toast.success(message);
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong!!!");
+    } finally {
+      setIsPending(false);
+    }
   };
 
   const handleClose = () => {
@@ -105,7 +99,7 @@ const AddSocialLinkModal = () => {
                     />
                     <FormField
                       control={form.control}
-                      name="email"
+                      name="url"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Link URL</FormLabel>
@@ -114,6 +108,7 @@ const AddSocialLinkModal = () => {
                               {...field}
                               type="text"
                               placeholder="http://example.com.vn/your_account"
+                              disabled={isPending}
                             />
                           </FormControl>
                           <FormMessage />

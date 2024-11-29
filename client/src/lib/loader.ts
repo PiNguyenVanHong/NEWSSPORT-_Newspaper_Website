@@ -11,6 +11,9 @@ import {
 } from "@/actions/article.api";
 import { getFavoritesByUserId } from "@/actions/favorite.api";
 import { getUserProfileById } from "@/actions/user.api";
+import { getAllSocialLink } from "@/actions/social-link.api";
+import { UserResponse } from "@/types/user.type";
+import { SocialLinkResponse } from "@/types/social-link.type";
 
 export const homepageLoader = async () => {
   try {
@@ -18,7 +21,7 @@ export const homepageLoader = async () => {
       filter: {
         current: 1,
         pageSize: 7,
-      }
+      },
     });
     const { results } = await getAllArticleTopHeading(query);
     return { results: results.sort(() => Math.random() - 0.5) };
@@ -204,17 +207,19 @@ export const topHeadingDashboardPageLoader = async () => {
     return { meta, articles: results };
   } catch (error) {
     console.log(error);
-    return { meta: null, articles: []};
+    return { meta: null, articles: [] };
   }
 };
 
 export const editUserProfilePageLoader = async () => {
-try {
-  const { result } = await getUserProfileById();
+  try {
+    const { result: userProrfileRst } = await getUserProfileById();
 
-  return { userInfo: result };
-} catch (error) {
-  console.log(error);
-  return null;
-}
+    const { results: socialLinks } = await getAllSocialLink();
+
+    return { userInfo: userProrfileRst, socialLinks };
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 };

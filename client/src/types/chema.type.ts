@@ -87,3 +87,8 @@ export const formUpdateArticleSchema = z.object({
 export const formResendMailSchema = z.object({
   email: z.string().email("Invalid email address").min(1, "Please fill email address")
 });
+
+export const formSocialLinkSchema = z.object({
+  name: z.string().min(1, "Please fill name address"),
+  url: z.string().url("Your social link is not valid").min(1, "Please fill social link"),
+});

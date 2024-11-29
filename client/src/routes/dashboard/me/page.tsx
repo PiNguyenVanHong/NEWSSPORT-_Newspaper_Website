@@ -42,39 +42,7 @@ import { setDescription, setTitle } from "@/lib/utils";
 import { updateUserProfile } from "@/actions/user.api";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useModal } from "@/hooks/use-modal-store";
-
-const socials = [
-  {
-    label: "Facebook account",
-    Icon: <Facebook strokeWidth={0} fill="#3F51B5" />,
-    value: "www.facebook.com/dadasddasddasdsada",
-  },
-  {
-    label: "Twitter account",
-    Icon: <Twitter strokeWidth={0} fill="#039BE5" />,
-    value: "",
-  },
-  {
-    label: "Instagram account",
-    Icon: <Instagram className="text-[#C32AA3]" />,
-    value: "www.instagram.com/dadasddasddasdsada",
-  },
-  {
-    label: "Dribbble account",
-    Icon: <Dribbble className="text-[#EA4C89]" />,
-    value: "www.facebook.com/dadasddasddasdsada",
-  },
-  {
-    label: "LinkedIn account",
-    Icon: <Linkedin strokeWidth={0} fill="#0A66C2" />,
-    value: "",
-  },
-  {
-    label: "Youtube account",
-    Icon: <Youtube className="text-[#FF0000]" strokeWidth={2} size={26} />,
-    value: "",
-  },
-];
+import { SocialLinkResponse } from "@/types/social-link.type";
 
 const formUserProfileSchema = z.object({
   firstName: z.string(),
@@ -91,13 +59,69 @@ function DashboardEditUserProfilePage() {
     { label: "User Profile Page" },
   ];
   const navigate = useNavigate();
-  const { userInfo }: { userInfo: UserResponse } = useLoaderData() as any;
+  const {
+    userInfo,
+    socialLinks,
+  }: { userInfo: UserResponse; socialLinks: SocialLinkResponse[] } =
+    useLoaderData() as any;
   const [isPending, setIsPending] = useState(false);
+  const [socials, setSocials] = useState([
+    {
+      id: "1",
+      label: "Facebook account",
+      Icon: <Facebook strokeWidth={0} fill="#3F51B5" />,
+      value: "",
+    },
+    {
+      id: "2",
+      label: "Twitter account",
+      Icon: <Twitter strokeWidth={0} fill="#039BE5" />,
+      value: "",
+    },
+    {
+      id: "3",
+      label: "Instagram account",
+      Icon: <Instagram className="text-[#C32AA3]" />,
+      value: "",
+    },
+    {
+      id: "4",
+      label: "Dribbble account",
+      Icon: <Dribbble className="text-[#EA4C89]" />,
+      value: "",
+    },
+    {
+      id: "5",
+      label: "LinkedIn account",
+      Icon: <Linkedin strokeWidth={0} fill="#0A66C2" />,
+      value: "",
+    },
+    {
+      id: "6",
+      label: "Youtube account",
+      Icon: <Youtube className="text-[#FF0000]" strokeWidth={2} size={26} />,
+      value: "",
+    },
+  ]);
   const { onOpen } = useModal();
 
   useEffect(() => {
     setTitle("User Profile - News Sport+");
     setDescription("This page to edit your profile");
+
+    const updatedSocials = socials.map((social) => {
+      const matchedLink = socialLinks.find((dbLink) =>
+        social.label.toLowerCase().includes(dbLink.name.toLowerCase())
+      );
+
+      return {
+        ...social,
+        id: matchedLink ? matchedLink.id! : social.id,
+        value: matchedLink ? matchedLink.link : "",
+      };
+    });
+
+    setSocials(updatedSocials);
   }, []);
 
   const form = useForm({
@@ -146,6 +170,12 @@ function DashboardEditUserProfilePage() {
     navigate("/dashboard");
   };
 
+  const handleOpenTab = (url: string) => {
+    if (url.trim().length <= 0) return;
+
+    window.open(url, "_blank");
+  };
+
   return (
     <div>
       <HeaderAction data={breadcrumbs} />
@@ -160,11 +190,10 @@ function DashboardEditUserProfilePage() {
                 <div className="px-6 pb-6">
                   <div className="-mt-14 relative z-10">
                     <Avatar className="w-24 h-24 border-4 border-background rounded-3xl overflow-hidden">
-                      <AvatarImage
-                        src={undefined}
-                        alt={userInfo.firstName}
-                      />
-                      <AvatarFallback className="rounded-lg text-2xl">PK</AvatarFallback>
+                      <AvatarImage src={undefined} alt={userInfo.firstName} />
+                      <AvatarFallback className="rounded-lg text-2xl">
+                        PK
+                      </AvatarFallback>
                     </Avatar>
                     {/* <div className="w-24 h-24 border-4 border-background rounded-3xl overflow-hidden">
                       <img src={UserImage} alt="" />
@@ -397,8 +426,11 @@ function DashboardEditUserProfilePage() {
                             {item.label}
                           </h4>
                           <span
+                            onClick={() => handleOpenTab(item.value)}
                             className={`truncate max-w-xs font-medium ${
-                              item.value ? "text-blue-500" : "text-neutral-600"
+                              item.value
+                                ? "text-blue-500 cursor-pointer hover:text-blue-700 transition-colors"
+                                : "text-neutral-600"
                             }`}
                           >
                             {item.value || "Not connected"}
@@ -408,10 +440,24 @@ function DashboardEditUserProfilePage() {
                       <Button
                         className="w-32 py-6"
                         type="button"
-                        variant={item.value ? "outline" : "default"}
-                        onClick={() => onOpen("add-social-link", { query: { name: item.label.split(" ")[0] } })}
+                        variant={
+                          item.value.trim().length > 0 ? "outline" : "default"
+                        }
+                        onClick={() => {
+                          if (item.value.trim().length <= 0) {
+                            onOpen("add-social-link", {
+                              query: { name: item.label.split(" ")[0] },
+                            });
+                          } else {
+                            onOpen("remove-social-link", {
+                              query: { id: item.id },
+                            });
+                          }
+                        }}
                       >
-                        {item.value ? "Disconnect" : "Connect"}
+                        {item.value.trim().length > 0
+                          ? "Disconnect"
+                          : "Connect"}
                       </Button>
                     </div>
                   ))}

@@ -1,3 +1,5 @@
+import { SocialLinkResponse } from "./social-link.type"
+
 export type UserRequest = {
     email: string,
     firstName: string,
@@ -17,6 +19,7 @@ export type UserResponse = {
     bio?: string,
     avatar: string,
     isTwoFactorEnabled?: boolean,
+    socialLinks?: SocialLinkResponse[],
 }
 
 export type MetaResponse = {

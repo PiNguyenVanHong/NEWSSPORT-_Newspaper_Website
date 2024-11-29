@@ -442,6 +442,7 @@ export class ArticlesService {
       const result = await this.articleRepository
         .createQueryBuilder('article')
         .leftJoinAndSelect('article.user', 'user')
+        .leftJoinAndSelect('user.socialLinks', 'social_links')
         .leftJoinAndSelect('article.category', 'category')
         .select([
           'article.id',
@@ -457,6 +458,8 @@ export class ArticlesService {
           'user.firstName',
           'user.lastName',
           'user.avatar',
+          'social_links.name',
+          'social_links.link',
           'category.id',
           'category.name',
         ])

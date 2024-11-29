@@ -1,6 +1,7 @@
 import axios from "axios";
 import { HOST } from "@/actions/api.route";
 import { refreshToken } from "./auth.api";
+import { getToken } from "@/lib/utils";
 
 export const requestClient = axios.create({
   baseURL: HOST,
@@ -9,7 +10,14 @@ export const requestClient = axios.create({
 });
 
 let isRefreshToken = false;
-let requestsToRefresh: ((token: string | null) => void)[] = [];
+
+requestClient.interceptors.request.use( async (config) => {
+  const token = await getToken();
+  if (token) {
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
+});
 
 requestClient.interceptors.response.use(
   (response) => response,
@@ -18,7 +26,7 @@ requestClient.interceptors.response.use(
     const status = response?.status;
 
     if (status === 401) {
-      const token = localStorage.getItem("token");
+      const token = await getToken();
       if (!token) return Promise.reject(error);
 
       if (!isRefreshToken) {
@@ -35,7 +43,6 @@ requestClient.interceptors.response.use(
           return Promise.reject(err);
         } finally {
           isRefreshToken = false;
-          requestsToRefresh = [];
         }
       }
     }
